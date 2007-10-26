@@ -11,13 +11,13 @@ import net.nexttext.behaviour.standard.DoNothing;
  */
 public class OnMouseIn extends OnMouseOver {
     
-    static final String REVISION = "$Header: /Volumes/Storage/Data/Groups/obx/CVS/NextText/src/net/nexttext/behaviour/control/Attic/OnMouseIn.java,v 1.1.2.1 2007/09/22 16:06:20 elie Exp $";
+    static final String REVISION = "$Header: /Volumes/Storage/Data/Groups/obx/CVS/NextText/src/net/nexttext/behaviour/control/Attic/OnMouseIn.java,v 1.1.2.2 2007/10/25 21:13:24 elie Exp $";
     
     private boolean isOver;
     private boolean wasOver;
     
     /**
-     * Creates an NTPOnMouseIn which performs the given Action when the mouse
+     * Creates an OnMouseIn which performs the given Action when the mouse
      * moves over the TextObject.
      *
      * @param trueAction the Action to perform when the mouse moves over the TextObject

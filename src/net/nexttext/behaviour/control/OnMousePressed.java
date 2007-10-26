@@ -10,13 +10,13 @@ import net.nexttext.processing.*;
  */
 public class OnMousePressed extends OnMouseDepressed {
     
-    static final String REVISION = "$Header: /Volumes/Storage/Data/Groups/obx/CVS/NextText/src/net/nexttext/behaviour/control/Attic/OnMousePressed.java,v 1.1.2.1 2007/09/22 16:06:20 elie Exp $";
+    static final String REVISION = "$Header: /Volumes/Storage/Data/Groups/obx/CVS/NextText/src/net/nexttext/behaviour/control/Attic/OnMousePressed.java,v 1.1.2.2 2007/10/25 21:13:24 elie Exp $";
     
     private boolean isPressed;
     private boolean wasPressed;
     
     /**
-     * Creates an NTPOnMousePressed which performs the given Action when the mouse 
+     * Creates an OnMousePressed which performs the given Action when the mouse 
      * button 1 is pressed.
      *
      * @param trueAction the Action to perform when the mouse button 1 is pressed
@@ -26,7 +26,7 @@ public class OnMousePressed extends OnMouseDepressed {
     }
     
     /**
-     * Creates an NTPOnMousePressed which performs the given Action when the selected
+     * Creates an OnMousePressed which performs the given Action when the selected
      * mouse button is pressed.
      *
      * @param buttonToCheck the mouse button to consider

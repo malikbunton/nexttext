@@ -21,7 +21,7 @@ import net.nexttext.processing.*;
  */
 public class OnDrag extends Condition implements Locatable {
   
-    static final String REVISION = "$Header: /Volumes/Storage/Data/Groups/obx/CVS/NextText/src/net/nexttext/behaviour/control/OnDrag.java,v 1.3.2.1 2007/09/22 16:06:20 elie Exp $";
+    static final String REVISION = "$Header: /Volumes/Storage/Data/Groups/obx/CVS/NextText/src/net/nexttext/behaviour/control/OnDrag.java,v 1.3.2.2 2007/10/25 21:02:21 elie Exp $";
 
     private ProcessingMouse mouse;
     private int buttonToCheck;
@@ -85,13 +85,18 @@ public class OnDrag extends Condition implements Locatable {
      * @return the outcome of the condition
      */
     public boolean condition(TextObject to) {
-    	if (mouse.isPressed(buttonToCheck) && to.getBoundingPolygon().contains(mouse.getX(), mouse.getY())) {
-            if (!dragging) {
-                dragging = true;
-                dragOffset = new Vector3(mouse.getX(), mouse.getY());
-                dragOffset.sub(to.getPositionAbsolute());
-            }
-            lastDragged = to;
+    	if (mouse.isPressed(buttonToCheck)) {
+    		if (to.getBoundingPolygon().contains(mouse.getX(), mouse.getY())) {
+    			if (!dragging) {
+    				dragging = true;
+    				dragOffset = new Vector3(mouse.getX(), mouse.getY());
+    				dragOffset.sub(to.getPositionAbsolute());
+    			}
+    		}
+    		
+    		if (dragging) {
+    			lastDragged = to;
+    		}
         } else {
             dragging = false;
         	dragOffset = new Vector3();

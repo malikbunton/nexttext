@@ -1,0 +1,50 @@
+<project name="NextText Library for Processing" default="jar">
+	
+	<description>
+	    This project builds the NextText library for Processing.  Just run "ant" and it 
+	    will put a jar file in the lib directory.  This jar should be moved to 
+	    "path/to/processing/libraries/nexttext/library/" for use in the Processing IDE.
+	</description>
+		
+	<property name="build.compiler"
+	          value="jikes"/>
+
+    <path id="nexttext.classpath">
+    	<pathelement location="classes"/>
+    	<fileset dir="extlib">
+      		<include name="**/*.jar"/>
+    	</fileset>
+  	</path>
+
+
+
+	<target name="jar">
+		<mkdir dir="classes"/>
+    	<mkdir dir="lib"/>
+
+    	<javac srcdir="src"
+               destdir="classes"
+               deprecation="true"
+               debug="true">
+      		<classpath refid="nexttext.classpath"/>
+    	</javac>
+
+    	<jar destfile="lib/NextText.jar" basedir="classes"/>
+  	</target>
+
+  	<target name="javadoc">
+    	<mkdir dir="javadoc"/>
+
+    	<javadoc sourcepath="src"
+      		     destdir="javadoc"
+                 packagenames="net.nexttext.*"
+                 classpathref="nexttext.classpath" />
+	</target>
+
+  	<target name="clean">
+    	<delete dir="classes"/>
+   		<delete dir="lib"/>
+    	<delete dir="javadoc"/>
+  	</target>
+	
+</project>

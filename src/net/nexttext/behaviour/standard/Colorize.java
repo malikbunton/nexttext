@@ -13,11 +13,13 @@ import net.nexttext.property.NumberProperty;
 
 /**
  * Fades the color of an object to a new color over time.
+ * 
+ * $Id$
  */
 public class Colorize extends AbstractAction {
      
-    private boolean applyToFill = true;
-    private boolean applyToStroke = false;
+    protected boolean applyToFill = true;
+    protected boolean applyToStroke = false;
     
     /**
      * The Colorize action will only influence the fill colour.
@@ -95,7 +97,7 @@ public class Colorize extends AbstractAction {
         return new ActionResult(false, true, false);
     }
     
-    private boolean fadeTo( ColorProperty currentProp, Color target, int speed ) {
+    protected boolean fadeTo( ColorProperty currentProp, Color target, int speed ) {
         
         Color currentCol = currentProp.get();
         

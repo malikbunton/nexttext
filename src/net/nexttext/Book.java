@@ -4,6 +4,7 @@
 
 package net.nexttext;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.io.PrintWriter;
@@ -22,6 +23,8 @@ import net.nexttext.input.InputManager;
 import net.nexttext.processing.FontManager;
 import net.nexttext.processing.ProcessingMouse;
 import net.nexttext.processing.renderer.Processing2DRenderer;
+import net.nexttext.property.ColorProperty;
+import net.nexttext.property.StrokeProperty;
 
 /**
  * The container for the NextText for Processing data and window.
@@ -32,11 +35,11 @@ import net.nexttext.processing.renderer.Processing2DRenderer;
  * <p>The Book has its own step(), draw(), and stepAndDraw() methods which replace
  * the Simulator loop found in regular NextText applications.</p>
  * <p>Any updates to the TextObject tree must be synchronized on the Book. </p>
+ *
+ * $Id$
  */
 public class Book {
 
-	static final String REVISION = "$Header: /Volumes/Storage/Data/Groups/obx/CVS/NextText/src/net/nexttext/Book.java,v 1.31.2.2 2007/09/25 21:34:22 elie Exp $";
-	
 	public static TextObjectBuilder toBuilder;
     public static ProcessingMouse mouse;
     
@@ -254,8 +257,8 @@ public class Book {
      * @param y the y-coordinate of the created TextObjectGroup
      */
     public void addText(String text, int x, int y) {
-        TextObjectGroup tog = toBuilder.build(text, x, y);
-        setColours(tog);     
+        setStrokeAndFill(); 
+        toBuilder.build(text, x, y);
     }
     
     /**
@@ -285,8 +288,8 @@ public class Book {
      * @param lineLength the max number of characters per line
      */
     public void addText(String text, int x, int y, int lineLength) {
-        TextObjectGroup tog = toBuilder.buildSentence(text, x, y, lineLength);
-        setColours(tog);
+        setStrokeAndFill();
+        toBuilder.buildSentence(text, x, y, lineLength);
     }
     
     /**
@@ -308,26 +311,65 @@ public class Book {
     }
     
     /**
-     * Sets the stroke and fill colours of the given TextObjectGroup based
-     * on the colours set in the PApplet.
-     * 
-     * @param tog the TextObjectGroup to modify
+     * Sets the stroke and fill properties based on the colours set in the PApplet.
      */
-    private void setColours(TextObjectGroup tog) {
-        if (pApplet.g.stroke) {
-            // set the stroke color property
-            tog.getStrokeColor().set(new Color(pApplet.g.strokeColor, true));
-        } else {
-            // set the stroke color property to transparent
-            tog.getColor().set(new Color(0, 0, 0, 0));
+    private void setStrokeAndFill() {
+    	setStroke();
+    	setFill();
+    }
+    
+    private void setStroke() {
+    	if (pApplet.g.stroke) {
+    		// set the stroke cap
+    		int cap;
+	    	switch (pApplet.g.strokeCap) {
+	    	case PApplet.SQUARE:
+	    		cap = BasicStroke.CAP_BUTT;
+	    		break;
+	    	case PApplet.PROJECT:
+	    		cap = BasicStroke.CAP_SQUARE;
+	    		break;
+	    	default:
+	    		cap = BasicStroke.CAP_ROUND;
+	    		break;
+	    	}
+	    	
+	    	// set the stroke join
+	    	int join;
+	    	switch (pApplet.g.strokeJoin) {
+	    	case PApplet.BEVEL:
+	    		join = BasicStroke.JOIN_BEVEL;
+	    		break;
+	    	case PApplet.ROUND:
+	    		join = BasicStroke.JOIN_ROUND;
+	    		break;
+	    	default:
+	    		join = BasicStroke.JOIN_MITER;
+	    		break;
+	    	}
+    	
+	    	// set the stroke property
+	    	toBuilder.removeGroupProperty("Stroke");
+        	toBuilder.addGroupProperty("Stroke", new StrokeProperty(new BasicStroke(pApplet.g.strokeWeight, cap, join)));
+    		
+        	// set the stroke color property
+            toBuilder.removeGroupProperty("StrokeColor");
+        	toBuilder.addGroupProperty("StrokeColor", new ColorProperty(new Color(pApplet.g.strokeColor, true)));
+            
+    	} else {
+    		// set the stroke color property to transparent
+    		toBuilder.removeGroupProperty("StrokeColor");
+        	toBuilder.addGroupProperty("StrokeColor", new ColorProperty(new Color(0, 0, 0, 0)));
         }
-        
-        if (pApplet.g.fill) {
+    }
+    
+    private void setFill() {
+    	toBuilder.removeGroupProperty("Color");
+    	if (pApplet.g.fill) {
             // set the fill color property
-            tog.getColor().set(new Color(pApplet.g.fillColor, true));
+        	toBuilder.addGroupProperty("Color", new ColorProperty(new Color(pApplet.g.fillColor, true)));
         } else {
-            // set the fill color property to transparent
-            tog.getColor().set(new Color(0, 0, 0, 0));
+        	toBuilder.addGroupProperty("Color", new ColorProperty(new Color(0, 0, 0, 0)));
         }
     }
     

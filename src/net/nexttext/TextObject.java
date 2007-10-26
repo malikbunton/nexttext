@@ -35,6 +35,8 @@ import java.util.Set;
  * <p>The tree structure is maintained inside the TextObject.  This allows tree
  * traversal and modification to be easily done by several methods in this
  * class.  </p>
+ * 
+ * $Id$
  */
 
 public abstract class TextObject implements Locatable {
@@ -107,13 +109,8 @@ public abstract class TextObject implements Locatable {
         properties.init("Rotation", new NumberProperty( 0 ));
         properties.init("Color", new ColorProperty() );
         properties.init("Stroke", new StrokeProperty());
-        // By default the stroke color is transparent, which means that the 
-        // stroke will not be processed by the Java2DRenderer.
-        properties.init("StrokeColor", new ColorProperty(new Color(0,0,0,0)));
-        // We want the objects to inherit the stroke colour since this 
-        // transparent colour is only a default.
-        ((ColorProperty)properties.get("StrokeColor")).setInherited(true);
-
+        properties.init("StrokeColor", new ColorProperty());
+        
         PropertyChangeListener pcl = new PropertyChangeListener() {
                 public void propertyChanged(Property propertyThatChanged) {
                     if (propertyThatChanged == properties.get("Position") ||

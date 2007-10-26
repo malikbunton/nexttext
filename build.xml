@@ -16,8 +16,6 @@
     	</fileset>
   	</path>
 
-
-
 	<target name="jar">
 		<mkdir dir="classes"/>
     	<mkdir dir="lib"/>
@@ -29,7 +27,7 @@
       		<classpath refid="nexttext.classpath"/>
     	</javac>
 
-    	<jar destfile="lib/NextText.jar" basedir="classes"/>
+    	<jar destfile="lib/nexttext.jar" basedir="classes"/>
   	</target>
 
   	<target name="javadoc">

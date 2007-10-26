@@ -99,7 +99,7 @@ public class TextObjectGroup extends TextObject {
         } else {
             // Traverse the children to find the correct location.
             newChild.leftSibling = leftMostChild;
-            for (int i = location; i > 1; i--) {
+            for (int i = location-1; i > 1; i--) {
                 newChild.leftSibling = newChild.leftSibling.rightSibling;
             }
             newChild.rightSibling = newChild.leftSibling.rightSibling;

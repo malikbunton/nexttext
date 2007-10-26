@@ -50,7 +50,7 @@ import java.util.regex.*;
 
 public class TextObjectBuilder {
 
-	static final String REVISION = "$Header: /Volumes/Storage/Data/Groups/obx/CVS/NextText/src/net/nexttext/TextObjectBuilder.java,v 1.21.6.1 2007/09/22 16:06:21 elie Exp $";
+	static final String REVISION = "$Header: /Volumes/Storage/Data/Groups/obx/CVS/NextText/src/net/nexttext/TextObjectBuilder.java,v 1.21.6.2 2007/09/25 21:34:22 elie Exp $";
 
     //////////////////////////////////////////////////////////////////////
     // Internal Members
@@ -90,14 +90,16 @@ public class TextObjectBuilder {
 
     Font font = new Font("courier", 0, 18);
     private Vector3 spaceOffset; // Width of a space character
-    private Vector3 lineOffset;  // Height of a line
+    private Vector3 trackingOffset; // Space between two characters
+    private Vector3 lineHeight;  // Height of a line
     public void setFont(Font font) { 
         this.font = font;
         
         FontRenderContext frc = new FontRenderContext(null, false, false);
 		GlyphVector sp = this.font.createGlyphVector( frc, " " );		
 		spaceOffset = new Vector3( (int)sp.getLogicalBounds().getWidth(), 0,0);        
-		lineOffset = new Vector3( 0,(int)sp.getLogicalBounds().getHeight(),0);
+		trackingOffset = new Vector3(0, 0, 0);
+		lineHeight = new Vector3( 0,(int)sp.getLogicalBounds().getHeight(),0);
     }
     public Font getFont() { return font; }
 
@@ -280,13 +282,13 @@ public class TextObjectBuilder {
             // If the token is a \n begin a new line
             if (tokenStr.equals("\n")) {
             	gOffset.x = pos.x;
-            	gOffset.add(lineOffset);
+            	gOffset.add(lineHeight);
             	continue;
             }
             
             // display other words
             TextObjectGroup token = createGroup( tokenStr, gOffset );
-            gOffset.add( new Vector3(token.getBoundingPolygon().getBounds().width,0,0) );
+            gOffset.add( new Vector3(token.getBoundingPolygon().getBounds().width+trackingOffset.x, 0, 0) );
             
             newGroup.attachChild( token );
         }
@@ -388,7 +390,7 @@ public class TextObjectBuilder {
             TextObjectGlyph to = 
                 new TextObjectGlyph(glyph, font, glyphProperties, gOffset);
 
-			gOffset.x += to.getLogicalBounds().getWidth();
+			gOffset.x += to.getLogicalBounds().getWidth()+trackingOffset.x;
 
             newGroup.attachChild(to);
         }
@@ -441,4 +443,9 @@ public class TextObjectBuilder {
             }
         }
     }
+    
+    public void setLineHeight(double d) { lineHeight.y = d; }
+    public double getLineHeight() { return lineHeight.y; }
+    public void setTrackingOffset(double d) { trackingOffset.x = d; }
+    public double getTrackingOffset() { return trackingOffset.x; }
 }

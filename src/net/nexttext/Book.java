@@ -35,7 +35,7 @@ import net.nexttext.processing.renderer.Processing2DRenderer;
  */
 public class Book {
 
-	static final String REVISION = "$Header: /Volumes/Storage/Data/Groups/obx/CVS/NextText/src/net/nexttext/Book.java,v 1.31.2.1 2007/09/22 16:06:21 elie Exp $";
+	static final String REVISION = "$Header: /Volumes/Storage/Data/Groups/obx/CVS/NextText/src/net/nexttext/Book.java,v 1.31.2.2 2007/09/25 21:34:22 elie Exp $";
 	
 	public static TextObjectBuilder toBuilder;
     public static ProcessingMouse mouse;
@@ -485,6 +485,12 @@ public class Book {
             child = child.getRightSibling();
         }
     }
+    
+    // font property setters and getters
+    public void setLineHeight(double d) { toBuilder.setLineHeight(d); }
+    public double getLineHeight() { return toBuilder.getLineHeight(); }
+    public void setTrackingOffset(double d) { toBuilder.setTrackingOffset(d); }
+    public double getTrackingOffset() { return toBuilder.getTrackingOffset(); }
 
     //////////////////////////////////////////////////////////////////////
     // Rudimentary Logging System

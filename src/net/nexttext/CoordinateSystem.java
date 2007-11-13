@@ -17,11 +17,11 @@ import java.awt.Polygon;
  *    		|  \z
  *    		y
  * </pre>
+ * 
+ * $Id$
  */
 public class CoordinateSystem {
    
-    static final String REVISION = "$CVSHeader$";
-    
     private Vector3 origin;
     private Axes axes;
     
@@ -95,7 +95,7 @@ public class CoordinateSystem {
      * <p>Polygons are 2D, so the transformation is done with the assumption
      * that all Z values are 0.  </p>
      *
-     * @returns a new Polygon object.
+     * @return a new Polygon object.
      */
     public Polygon transform(Polygon inPoly) {
         Polygon outPoly = new Polygon();

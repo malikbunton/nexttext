@@ -10,9 +10,7 @@ import java.awt.Color;
 import java.awt.BasicStroke;
 import java.awt.Polygon;
 import java.awt.Rectangle;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -41,8 +39,6 @@ import java.util.Set;
 
 public abstract class TextObject implements Locatable {
 	
-	static final String REVISION = "$CVSHeader: NextText/src/net/nexttext/TextObject.java,v 1.42 2006/08/15 16:16:15 lucieb Exp $";
-
     // The parent node in the TextObject tree.  If parent is null, it means
     // either that this is not part of the hierarchy attached to the book, or
     // it means that this is the root of that hierarchy, is attached directly
@@ -207,7 +203,7 @@ public abstract class TextObject implements Locatable {
      * Get the greatest number of layers between this TextObject and the leaves
      * of the tree.
      *
-     * @returns 0 if this node is a leaf of the tree, 1 + the greatest depth of
+     * @return 0 if this node is a leaf of the tree, 1 + the greatest depth of
      * its children otherwise.  </p>
      */
     public abstract int getHeight();
@@ -539,7 +535,8 @@ public abstract class TextObject implements Locatable {
      * either 'stroked' or 'filled'. When a change is done, we need to 
      * recursively propagate it to the children since ColorProperties can be 
      * inherited from parents.
-     * @param newColProp the ColorProperty that changed
+     * 
+     * @param colProp the ColorProperty that changed
      */
     protected abstract void colourFlagChanged(ColorProperty colProp);
     

@@ -8,10 +8,10 @@ import java.awt.event.MouseEvent;
 /**
  * The ProcessingMouse is a Mouse InputSource for Processing 
  * which is automatically updated as the sketch is running.
+ * 
+ * $Id$
  */
 public class ProcessingMouse extends Mouse {
-	
-	static final String REVISION = "$Header: /Volumes/Storage/Data/Groups/obx/CVS/NextText/src/net/nexttext/processing/Attic/ProcessingMouse.java,v 1.1.2.1 2007/09/22 16:06:21 elie Exp $";
 	
 	private int mX;
 	private int mY;
@@ -20,7 +20,7 @@ public class ProcessingMouse extends Mouse {
     /**
      * Instantiates the ProcessingMouse.
      * 
-     * @param pApplet the parent PApplet
+     * @param p the parent PApplet
      */
 	public ProcessingMouse(PApplet p) {
 		p.registerMouseEvent(this);

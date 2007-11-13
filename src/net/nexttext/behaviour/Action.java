@@ -29,12 +29,12 @@ import net.nexttext.TextObject;
  * complete.  An Action may be called again after completeness is indicated
  * through these mechanisms, which is interpreted as the Action &quot;starting
  * again&quot;.  </p>
+ * 
+ * $Id$
  */
 
 public interface Action {
     
-    static final String REVISION = "$CVSHeader: NextText/src/net/nexttext/behaviour/Action.java,v 1.2 2005/05/16 16:55:46 dissent Exp $";
-
     /** Used to communicate results of Action.behave(). */
     public class ActionResult {
         /** Indicate that the action has completed. */
@@ -88,7 +88,7 @@ public interface Action {
          * <p>This step is necessary because what is returned depends on
          * whether any of the actions set canComplete.  </p>
          *
-         * @returns this
+         * @return this
          */
         public ActionResult endCombine() {
             if (!canComplete)
@@ -134,7 +134,7 @@ public interface Action {
      * is usually handled by the Behaviour containing the action.  </p>
      *
      * <p>Typically an Action inherits the implementation of this method from a
-     * base class, such as {@link AbstractAction} or {@link PhysicsAction}.
+     * base class, such as {@link AbstractAction} or {@link net.nexttext.behaviour.physics.PhysicsAction}.
      * </p>
      */    
     public Map getRequiredProperties();

@@ -24,13 +24,12 @@ import net.nexttext.*;
  * Look at http://java.sun.com/docs/books/tutorial/extra/fullscreen/index.html
  * for more details.
  *
+ * $Id$
  */
 
 public class Java2DRenderer extends JFrame implements PageRenderer {
 
-    static final String REVISION = "$CVSHeader: NextText/src/net/nexttext/renderer/Java2DRenderer.java,v 1.30 2006/06/28 21:11:47 tafsiri Exp $";
-	
-	/** antialias on/off flag.  on by default */
+    /** antialias on/off flag.  on by default */
 	boolean antialias = true;
 	boolean fullscreen = false;
         
@@ -282,10 +281,10 @@ public class Java2DRenderer extends JFrame implements PageRenderer {
      * 
      * @param decorated indicates if the window should have a title bar etc.    
      */
-    public void makeVisible(boolean b)
+    public void makeVisible(boolean decorated)
     {   
         dispose();
-        setUndecorated(!b);
+        setUndecorated(!decorated);
         pack();
         setVisible(true);
     }

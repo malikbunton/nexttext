@@ -26,10 +26,10 @@ import net.nexttext.behaviour.Action;
  * <p>If the current action is incremented, then ActionResult.event is
  * returned, unless there is no next action, in which case
  * ActionResult.complete is returned.  </p>
+ * 
+ * $Id$
  */
 public class Chain extends AbstractAction {
-    
-    static final String REVISION = "$CVSHeader: NextText/src/net/nexttext/behaviour/control/Chain.java,v 1.4 2006/04/21 15:49:05 dissent Exp $";
     
     protected List actions;
 
@@ -61,7 +61,7 @@ public class Chain extends AbstractAction {
      *
      * <p>If the action is completed, update current action.  </p>
      *
-     * @returns ActionResult with event set if the current action was
+     * @return ActionResult with event set if the current action was
      * incremented, and complete set if it was incremented past the end of the
      * chain.
      */

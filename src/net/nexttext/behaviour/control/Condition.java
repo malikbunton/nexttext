@@ -19,10 +19,10 @@ import net.nexttext.behaviour.Action;
  * otherwise it will apply the falseAction.  </p>
  * 
  * TODO: Handle object pairs, object arrays.
+ * 
+ * $Id$
  */
 public abstract class Condition extends AbstractAction  {
-    
-    static final String REVISION = "$CVSHeader: NextText/src/net/nexttext/behaviour/control/Condition.java,v 1.2 2005/05/16 16:55:46 dissent Exp $";
     
     protected Action trueAction;
     protected Action falseAction;
@@ -41,7 +41,7 @@ public abstract class Condition extends AbstractAction  {
      * Applies the trueAction if the result of condition() is true and 
      * applies the falseAction otherwise.
      * 
-     * @returns the result of the Action that was applied.
+     * @return the result of the Action that was applied.
      */
     public ActionResult behave(TextObject to) {
         

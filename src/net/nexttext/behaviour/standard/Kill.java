@@ -5,23 +5,21 @@
 package net.nexttext.behaviour.standard;
 
 import net.nexttext.TextObject;
-import net.nexttext.TextObjectRoot;
 import net.nexttext.behaviour.AbstractAction;
-import net.nexttext.behaviour.Action;
 
 /**
- * The Kill action flags an object for removal from the {@link Book}, causing it 
- * to cease to exist completly. 
+ * The Kill action flags an object for removal from the {@link net.nexttext.Book}, causing it 
+ * to cease to exist completely. 
  * 
  * <p>Note that the object is not immediately removed for synchronization 
  * reasons.  Rather, it will be eliminated at the end of the current frame. </p>
  * 
- * <p>Killing a {@link TextObjectGroup} will destroy all of its children as 
+ * <p>Killing a {@link net.nexttext.TextObjectGroup} will destroy all of its children as 
  * well. </p>
+ * 
+ * $Id$
  */
 public class Kill extends AbstractAction {
-    
-    static final String REVISION = "$CVSHeader: NextText/src/net/nexttext/behaviour/standard/Kill.java,v 1.3 2005/07/28 21:17:55 dissent Exp $";
     
     /**
      * Kills a TextObject.   

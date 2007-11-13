@@ -8,18 +8,18 @@ import processing.core.PApplet;
 /**
  * This class controls access to custom fonts in the 'data' folder of the sketch. The 
  * fonts must be in the TrueType format with extension '.ttf'.
+ * 
+ * $Id$
  */
 public class FontManager {
-
-    static final String REVISION = "$Header: /Volumes/Storage/Data/Groups/obx/CVS/NextText/src/net/nexttext/processing/Attic/FontManager.java,v 1.1.2.1 2007/09/22 16:06:22 elie Exp $";
     
     static final float DEFAULT_SIZE = 48.0f;
     
     /**
      * Loads the font with the given filename from the 'data' folder of the sketch
      * 
-     * @param the parent PApplet
-     * @param filename
+     * @param pApplet the parent PApplet
+     * @param filename the font file name
      * 
      * @return the loaded font
      */

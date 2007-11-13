@@ -19,12 +19,12 @@ import net.nexttext.property.Vector3Property;
  * <p>By default, StayInWindow bounces objects off the edge of the visible
  * window.  It can be configured to change the window size and object
  * behaviour.  </p>
+ * 
+ * $Id$
  */
 public class StayInWindow extends PhysicsAction implements Action {
   
-	static final String REVISION = "$Header: /Volumes/Storage/Data/Groups/obx/CVS/NextText/src/net/nexttext/behaviour/physics/StayInWindow.java,v 1.4.2.1 2007/09/22 16:06:21 elie Exp $";
-	
-    boolean bounce;
+	boolean bounce;
     
     /** Window to keep things in. */
     long minX, maxX, minY, maxY;
@@ -33,8 +33,7 @@ public class StayInWindow extends PhysicsAction implements Action {
      * Creates a StayInWindow which constraints TextObjects to always remain 
      * within the bounds of the PApplet and to bounce off the edges.
      *
-     * @param bounce Causes the objects to bounce off the edges if true or to
-     * stick to the edges if false.
+     * @param p the parent PApplet
      */
     public StayInWindow(PApplet p) {            
         this(new Rectangle(0, 0, p.width, p.height), true);
@@ -44,6 +43,7 @@ public class StayInWindow extends PhysicsAction implements Action {
      * Creates a StayInWindow which constraints TextObjects to always remain 
      * within the bounds of the PApplet.
      *
+     * @param p the parent PApplet
      * @param bounce Causes the objects to bounce off the edges if true or to
      * stick to the edges if false.
      */

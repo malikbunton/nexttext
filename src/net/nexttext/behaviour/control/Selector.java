@@ -29,7 +29,7 @@ import net.nexttext.behaviour.Action;
  * when the current action changes.
  * </p>
  * 
- *
+ * $Id$
  */
 public class Selector extends AbstractAction {
     
@@ -68,7 +68,7 @@ public class Selector extends AbstractAction {
     /**
      * Applies the current action
      * 
-     * @returns ActionResult(false, false, true) if the current action
+     * @return ActionResult(false, false, true) if the current action
      * completes or signals an event. Else returns ActionResult(false, false, false)
      * 
      */

@@ -22,7 +22,7 @@ package net.nexttext.behaviour.standard;
 import net.nexttext.TextObject;
 import net.nexttext.TextObjectGroup;
 import net.nexttext.behaviour.AbstractAction;
-import net.nexttext.renderer.pages.TextObjectRasterizer;
+import net.nexttext.renderer.TextObjectRasterizer;
 
 /**
  * Action to send textObjects to a TextObjectRasterizer.

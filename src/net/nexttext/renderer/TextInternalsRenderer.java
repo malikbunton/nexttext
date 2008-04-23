@@ -15,39 +15,42 @@
 
   You should have received a copy of the GNU General Public License along with 
   NextText.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 package net.nexttext.renderer;
 
-import net.nexttext.*;
-
-import java.awt.Component;
-import java.awt.Graphics2D;
-
 import java.util.Iterator;
+import net.nexttext.*;
 
 /**
  * This renderer prints out the internals of the TextPage tree to the console.
- *
- * <p>It's good for debugging when you want to know what's going on.</p>
+ * 
+ * <p>
+ * It's good for debugging when you want to know what's going on.
+ * </p>
  */
 /* $Id$ */
-public class TextInternalsRenderer implements TextPageRenderer{
-
-    public void render(TextPage textPage, Graphics2D g, Component c) {
-        processNode(textPage.getTextRoot());        
+public class TextInternalsRenderer extends TextPageRenderer {
+    public TextInternalsRenderer() {
+        super(null);
     }
 
-    // Rendering is done recursively.  A prefix is maintained so that objects
+    public void renderPage(TextPage textPage) {
+        processNode(textPage.getTextRoot());
+    }
+
+    // Rendering is done recursively. A prefix is maintained so that objects
     // are indented further deeper in the tree.
 
     String prefix = "";
 
     void processNode(TextObject node) {
-        if (node == null) return;
+        if (node == null)
+            return;
         System.out.print(prefix);
         if (node instanceof TextObjectGlyph) {
-            System.out.println("<glyph> " + ((TextObjectGlyph) node).getGlyph());
+            System.out
+                    .println("<glyph> " + ((TextObjectGlyph) node).getGlyph());
             processProperties(node);
         } else {
             System.out.println("<node>");

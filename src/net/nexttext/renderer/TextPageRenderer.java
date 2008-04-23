@@ -19,10 +19,9 @@
 
 package net.nexttext.renderer;
 
-import java.awt.Component;
-import java.awt.Graphics2D;
+import java.awt.*;
 
-import net.nexttext.TextPage;
+import net.nexttext.*;
 
 /**
  * An interface that represents classes capable of rendering a TextPage
@@ -30,8 +29,13 @@ import net.nexttext.TextPage;
  *
  */
 /* $Id$ */
-public interface TextPageRenderer {
-
+public abstract class TextPageRenderer {
+    protected Component canvas;
+    
+    public TextPageRenderer(Component canvas) {
+        this.canvas = canvas;    
+    }
+    
     /**
      * In implementing this method do not call getGraphics on 
      * the component passed in as it will cause flickering.
@@ -40,6 +44,14 @@ public interface TextPageRenderer {
      * boxes can be determined if necessary. It is expected that many 
      * classes implementing this interface will have no use for the component</p>      
      */
-    public void render(TextPage textPage, Graphics2D g, Component c);
+    public abstract void renderPage(TextPage textPage);
     
+    /**
+     * Returns the Component used for drawing
+     *
+     * @return Component the drawing surface
+     */
+    public Component getCanvas() { 
+        return canvas;
+    } 
 }

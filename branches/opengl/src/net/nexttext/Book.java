@@ -22,6 +22,7 @@ package net.nexttext;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.geom.AffineTransform;
 import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.HashSet;
@@ -32,12 +33,14 @@ import java.util.List;
 import java.util.Set;
 
 import processing.core.PApplet;
+import processing.core.PGraphicsJava2D;
+import processing.opengl.PGraphicsOpenGL;
 
 import net.nexttext.behaviour.AbstractBehaviour;
 import net.nexttext.input.InputManager;
+import net.nexttext.renderer.*;
 import net.nexttext.processing.FontManager;
 import net.nexttext.processing.ProcessingMouse;
-import net.nexttext.processing.renderer.Processing2DRenderer;
 import net.nexttext.property.ColorProperty;
 import net.nexttext.property.StrokeProperty;
 
@@ -71,7 +74,7 @@ public class Book {
     public void incrementFrameCount() { frameCount++; }
 	
     protected LinkedHashMap pages;
-    protected Processing2DRenderer renderer;
+    protected Java2DTextPageRenderer defaultRenderer;
     protected List behaviourList;
     protected TextObjectRoot textRoot;	// the root of the TextObject hierarchy
     protected InputManager inputs;
@@ -84,18 +87,24 @@ public class Book {
      * @param pApplet the parent PApplet
      */
     public Book(PApplet pApplet) {
-    	// initialize the core objects 
-        renderer = new Processing2DRenderer(pApplet); 
+    	// initialize the core objects
+        if (pApplet.g instanceof PGraphicsJava2D) {
+            defaultRenderer = new Java2DTextPageRenderer(pApplet, ((PGraphicsJava2D)pApplet.g).g2); 
+        } else if (pApplet.g instanceof PGraphicsOpenGL) {
+            //defaultRenderer = new Java2DTextPageRenderer(pApplet, ((PGraphicsJava2D)pApplet.g).g2); 
+        } else {
+            throw new RuntimeException("NextText only works with Java2D or OpenGL!");
+        }
     	pages = new LinkedHashMap();
     	behaviourList = new LinkedList();
     	textRoot = new TextObjectRoot(this);
-        inputs = new InputManager(renderer.getCanvas());
+        inputs = new InputManager(defaultRenderer.getCanvas());
         spatialList = new SpatialList();
         
         this.pApplet = pApplet;
         
         // create a default text page
-        TextPage defaultTextPage = new TextPage(this);
+        TextPage defaultTextPage = new TextPage(this, defaultRenderer);
         addPage("Default Text Page", defaultTextPage);
         
         // initialize the TextObjectBuilder
@@ -201,7 +210,13 @@ public class Book {
      * Renders a frame.
      */
     public void draw() {
-        renderer.renderPages(getPages());
+        // render all the pages
+        Collection pages = getPages();
+        Iterator i = pages.iterator();
+        while (i.hasNext()) {
+            TextPage page = (TextPage)i.next();
+            page.render();
+        }
     }
     
     /**
@@ -210,7 +225,7 @@ public class Book {
      * @param pageName the name of the Page to render
      */
     public void drawPage(String pageName) {
-    	renderer.renderPage(getPage(pageName));
+        getPage(pageName).render();
     }
     
     /**
@@ -496,7 +511,7 @@ public class Book {
 	// Get methods
 	
     /** Returns the page renderer */
-	public PageRenderer getRenderer() { return renderer; }
+	public TextPageRenderer getRenderer() { return defaultRenderer; }
     /** Returns the page set */
     public Collection getPages() { return pages.values(); }
 	/** Returns the BehaviourList */
@@ -518,7 +533,7 @@ public class Book {
      * <p>The page will be named "layerN" where N = 0,1,2,3...</p>
      * 
      */
-    public void addPage(Page p){
+    public void addPage(TextPage p){
         String name = "layer" + pages.size();
         pages.put(name,p);
     }
@@ -526,7 +541,7 @@ public class Book {
     /**
      * Add a named page to the book
      */
-    public void addPage(String name, Page p){
+    public void addPage(String name, TextPage p){
         if (pages.containsKey(name)) {
         	log("WARNING: A Page with the name '"+name+"' already exists and will be deleted!");
         }
@@ -539,14 +554,14 @@ public class Book {
      * @param pageName the name of the TextPage to add
      */
     public void addPage(String pageName) {
-    	addPage(pageName, new TextPage(this));
+    	addPage(pageName, new TextPage(this, defaultRenderer));
     }
     
     /**
      * Get a named page from the book
      */
-    public Page getPage(String name){
-        return (Page)pages.get(name);
+    public TextPage getPage(String name){
+        return (TextPage)pages.get(name);
     }
 	
 	/**
@@ -581,7 +596,7 @@ public class Book {
     public void clear() {
     	Iterator i = pages.values().iterator();
         while (i.hasNext()) {
-        	Page page = (Page)i.next();
+        	TextPage page = (TextPage)i.next();
         	if (page instanceof TextPage) {
         		TextPage textPage = (TextPage)page;
         		removeChildren(textPage.getTextRoot());

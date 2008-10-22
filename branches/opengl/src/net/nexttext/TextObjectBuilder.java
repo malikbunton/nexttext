@@ -103,20 +103,21 @@ public class TextObjectBuilder {
     //////////////////////////////////////////////////////////////////////
     // Configurable parameters
 
-    Font font = new Font("courier", 0, 18);
+    PFont pfont;
+    //Font font = new Font("courier", 0, 18);
     private Vector3 spaceOffset; // Width of a space character
     private Vector3 trackingOffset; // Space between two characters
     private Vector3 lineHeight;  // Height of a line
-    public void setFont(Font font) { 
-        this.font = font;
+    public void setFont(PFont font) { 
+        this.pfont = font;
         
         FontRenderContext frc = new FontRenderContext(null, false, false);
-		GlyphVector sp = this.font.createGlyphVector( frc, " " );		
+		GlyphVector sp = this.pfont.findFont().createGlyphVector( frc, " " );		
 		spaceOffset = new Vector3( (int)sp.getLogicalBounds().getWidth(), 0,0);        
 		trackingOffset = new Vector3(0, 0, 0);
 		lineHeight = new Vector3( 0,(int)sp.getLogicalBounds().getHeight(),0);
     }
-    public Font getFont() { return font; }
+    public PFont getFont() { return pfont; }
 
 
     Vector3 pos = new Vector3(0,0,0);
@@ -133,7 +134,7 @@ public class TextObjectBuilder {
 
     int align = PConstants.LEFT;
     /** Set the horizontal alignment type of the group around the position. */
-    public void textAlign(int align) {
+    public void setTextAlign(int align) {
         this.align = align;
     }
 
@@ -403,7 +404,7 @@ public class TextObjectBuilder {
             String glyph = text.substring(i,i+1);
             
             TextObjectGlyph to = 
-                new TextObjectGlyph(glyph, font, glyphProperties, gOffset);
+                new TextObjectGlyph(glyph, pfont, glyphProperties, gOffset);
 
 			gOffset.x += to.getLogicalBounds().getWidth()+trackingOffset.x;
 

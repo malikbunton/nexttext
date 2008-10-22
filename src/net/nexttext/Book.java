@@ -32,9 +32,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import processing.core.PApplet;
-import processing.core.PGraphicsJava2D;
-import processing.opengl.PGraphicsOpenGL;
+import processing.core.*;
+import processing.opengl.*;
 
 import net.nexttext.behaviour.AbstractBehaviour;
 import net.nexttext.input.InputManager;
@@ -60,7 +59,7 @@ public class Book {
 	public static TextObjectBuilder toBuilder;
     public static ProcessingMouse mouse;
     
-    private PApplet pApplet;   
+    private PApplet p;   
 
     /**
      * The current frame count.
@@ -74,7 +73,7 @@ public class Book {
     public void incrementFrameCount() { frameCount++; }
 	
     protected LinkedHashMap pages;
-    protected Java2DTextPageRenderer defaultRenderer;
+    protected PGraphicsTextPageRenderer defaultRenderer;
     protected List behaviourList;
     protected TextObjectRoot textRoot;	// the root of the TextObject hierarchy
     protected InputManager inputs;
@@ -84,24 +83,17 @@ public class Book {
     /**
      * Instantiates the Book.
      * 
-     * @param pApplet the parent PApplet
+     * @param p the parent PApplet
      */
-    public Book(PApplet pApplet) {
-    	// initialize the core objects
-        if (pApplet.g instanceof PGraphicsJava2D) {
-            defaultRenderer = new Java2DTextPageRenderer(pApplet, ((PGraphicsJava2D)pApplet.g).g2); 
-        } else if (pApplet.g instanceof PGraphicsOpenGL) {
-            //defaultRenderer = new Java2DTextPageRenderer(pApplet, ((PGraphicsJava2D)pApplet.g).g2); 
-        } else {
-            throw new RuntimeException("NextText only works with Java2D or OpenGL!");
-        }
-    	pages = new LinkedHashMap();
+    public Book(PApplet p) {
+    	defaultRenderer = new PGraphicsTextPageRenderer(p); 
+        pages = new LinkedHashMap();
     	behaviourList = new LinkedList();
     	textRoot = new TextObjectRoot(this);
         inputs = new InputManager(defaultRenderer.getCanvas());
         spatialList = new SpatialList();
         
-        this.pApplet = pApplet;
+        this.p = p;
         
         // create a default text page
         TextPage defaultTextPage = new TextPage(this, defaultRenderer);
@@ -110,7 +102,7 @@ public class Book {
         // initialize the TextObjectBuilder
         toBuilder = new TextObjectBuilder(this, defaultTextPage);
         // initialize the ProcessingMouse
-        mouse = new ProcessingMouse(pApplet);
+        mouse = new ProcessingMouse(p);
     }
     
 	///////////////////////////////////////////////////////////////////////////
@@ -249,29 +241,27 @@ public class Book {
      * @return the loaded font
      */
     public Font loadFont(String filename) {
-    	return FontManager.loadFont(pApplet, filename);
+    	return FontManager.loadFont(p, filename);
     }
     
     /**
-     * Sets the font of the TextObjectBuilder.
-     * 
-     * @param font font to derive
-     * @param size font size
+     * Sets the font of the TextObjectBuilder based on the PApplet's active font.
      */
-    public void textFont(Font font, float size) {
-        toBuilder.setFont(FontManager.deriveFont(font, size));
-    }
-    
-    /**
-     * Sets the font of the TextObjectBuilder.
-     * 
-     * @param font font to derive
-     * @param size font size
-     * @param italic whether the font is italic
-     * @param bold whether the font is bold
-     */
-    public void textFont(Font font, float size, boolean italic, boolean bold) {
-        toBuilder.setFont(FontManager.deriveFont(font, size, italic, bold));
+    private void setFont() {
+        PFont pf = p.g.textFont;
+        if (pf == null) {
+            PGraphics.showException("Use textFont() before Book.addText()");
+        }
+        Font f = pf.findFont();
+        
+        if (f == null) {
+            PGraphics.showException("Cannot find the native version of the active PFont. Make sure it is installed on this machine!");
+        }
+        
+        toBuilder.setTextAlign(p.g.textAlign);
+        // TODO add font size in here somehow
+        toBuilder.setFont(pf);
+        //toBuilder.setFont(FontManager.deriveFont(f, p.g.textSize));
     }
     
     ///////////////////////////////////////////////////////////////////////////
@@ -288,6 +278,7 @@ public class Book {
      * @return TextObjectGroup the built TextObjectGroup
      */
     public TextObjectGroup addText(String text, int x, int y) {
+        setFont();
     	TextObjectGroup newTog = toBuilder.build(text, x, y);
     	setStrokeAndFill(newTog); 
 
@@ -326,7 +317,8 @@ public class Book {
      * @return TextObjectGroup the built TextObjectGroup
      */
     public TextObjectGroup addText(String text, int x, int y, int lineLength) {
-    	TextObjectGroup newTog = toBuilder.buildSentence(text, x, y, lineLength);
+        setFont();
+        TextObjectGroup newTog = toBuilder.buildSentence(text, x, y, lineLength);
     	setStrokeAndFill(newTog);
 
         return newTog;
@@ -371,10 +363,10 @@ public class Book {
     private void setStroke(TextObject to) {
     	ColorProperty colProp = to.getStrokeColor();
     	
-    	if (pApplet.g.stroke) {
+    	if (p.g.stroke) {
     		// set the stroke cap
     		int cap;
-	    	switch (pApplet.g.strokeCap) {
+	    	switch (p.g.strokeCap) {
 	    	case PApplet.SQUARE:
 	    		cap = BasicStroke.CAP_BUTT;
 	    		break;
@@ -388,7 +380,7 @@ public class Book {
 	    	
 	    	// set the stroke join
 	    	int join;
-	    	switch (pApplet.g.strokeJoin) {
+	    	switch (p.g.strokeJoin) {
 	    	case PApplet.BEVEL:
 	    		join = BasicStroke.JOIN_BEVEL;
 	    		break;
@@ -402,12 +394,12 @@ public class Book {
     	
 	    	// set the stroke property
 	    	StrokeProperty strokeProp = to.getStroke();
-	    	strokeProp.setOriginal(new BasicStroke(pApplet.g.strokeWeight, cap, join));
-	    	strokeProp.set(new BasicStroke(pApplet.g.strokeWeight, cap, join));
+	    	strokeProp.setOriginal(new BasicStroke(p.g.strokeWeight, cap, join));
+	    	strokeProp.set(new BasicStroke(p.g.strokeWeight, cap, join));
     		
 	    	// set the stroke color property
-	    	colProp.setOriginal(new Color(pApplet.g.strokeColor, true));
-	    	colProp.set(new Color(pApplet.g.strokeColor, true));
+	    	colProp.setOriginal(new Color(p.g.strokeColor, true));
+	    	colProp.set(new Color(p.g.strokeColor, true));
             
     	} else {
     		// set the stroke color property to transparent
@@ -424,10 +416,10 @@ public class Book {
     private void setFill(TextObject to) {
     	ColorProperty colProp = to.getColor();
     	
-    	if (pApplet.g.fill) {
+    	if (p.g.fill) {
             // set the fill color property
-    		colProp.setOriginal(new Color(pApplet.g.fillColor, true));
-    		colProp.set(new Color(pApplet.g.fillColor, true));
+    		colProp.setOriginal(new Color(p.g.fillColor, true));
+    		colProp.set(new Color(p.g.fillColor, true));
         } else {
         	// set the fill color property to transparent
         	colProp.setOriginal(new Color(0, 0, 0, 0));
@@ -621,8 +613,6 @@ public class Book {
     public void setTrackingOffset(double d) { toBuilder.setTrackingOffset(d); }
     public double getTrackingOffset() { return toBuilder.getTrackingOffset(); }
     
-    public void textAlign(int i) { toBuilder.textAlign(i); }
-
     //////////////////////////////////////////////////////////////////////
     // Rudimentary Logging System
 

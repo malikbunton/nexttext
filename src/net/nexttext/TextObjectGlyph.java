@@ -37,6 +37,8 @@ import net.nexttext.property.Vector3Property;
 import net.nexttext.property.Vector3PropertyList;
 import net.nexttext.property.ColorProperty;
 
+import processing.core.PFont;
+
 /**
  * TextObjectGlyph represents an individual glyph and it's vectorial outline in 
  * a data structure that is understood by the Renderer.
@@ -77,7 +79,7 @@ public class TextObjectGlyph extends TextObject {
 	/** The character for this object.  This is a special property that is 
 	 * handled through its own get/set methods */
 	protected String 	glyph;
-	protected Font		font;
+	protected PFont		pfont;
 	
 	/** A vector containing int[] arrays with indices to the Control Points property
 	 list.  These contours define the shape of the glyph */
@@ -114,20 +116,20 @@ public class TextObjectGlyph extends TextObject {
 	 * is inherited from the parent.
 	 *
 	 * @param glyph		A one character-long string 
-	 * @param font      A java.awt.Font object 
+	 * @param font      A processing.core.PFont object 
 	 */
-	public TextObjectGlyph( String glyph, Font font ) {
- 		this( glyph, font, new Vector3(0,0,0));
+	public TextObjectGlyph(String glyph, PFont font) {
+ 		this(glyph, font, new Vector3(0,0,0));
 	}
 	
 	/**
 	 * Constructor with a specific position.
 	 *
 	 * @param glyph		A one character-long string 
-	 * @param font      A java.awt.Font object 
+	 * @param font      A processing.core.PFont object 
 	 * @param position  A Vector3 representing the glyph's relative position
 	 */
-    public TextObjectGlyph(String glyph, Font font, Vector3 position) {
+    public TextObjectGlyph(String glyph, PFont font, Vector3 position) {
         this(glyph, font, new HashMap(0), position);
     }
 
@@ -135,15 +137,15 @@ public class TextObjectGlyph extends TextObject {
 	 * Constructor with extra properties and a specific position.
 	 *
 	 * @param glyph		A one character-long string 
-	 * @param font      A java.awt.Font object 
+	 * @param font      A processing.core.PFont object 
 	 * @param pos       A Vector3 representing the glyph's relative position
 	 * @param props     Initial properties for the glyph.
 	 */
-	public TextObjectGlyph(String glyph, Font font, Map props, Vector3 pos) {
+	public TextObjectGlyph(String glyph, PFont font, Map props, Vector3 pos) {
         super(props, pos);
 
 	 	this.glyph 	= glyph;
-		this.font 	= font; 
+		this.pfont 	= font; 
 
         properties.init("Control Points", new Vector3PropertyList());
         
@@ -205,18 +207,18 @@ public class TextObjectGlyph extends TextObject {
 	 * properties of the newly specified Font object.  This operation is rather
 	 * costly, so it should be used accordingly.
 	 */
-	public void setFont( Font font ) {
+	public void setFont(PFont font) {
         // Ideally setFont would attempt to preserve deformations.  However
         // that's a lot of work, so we have deferred it.
-		this.font = font;
+		this.pfont = font;
         glyphChanged();
 	}
 	
 	/**
 	 * Returns this TextObjectGlyph's font attribute.
 	 */
-	public Font getFont() {
-		return this.font;
+	public PFont getFont() {
+		return this.pfont;
 	}
 	
 	/**
@@ -309,7 +311,7 @@ public class TextObjectGlyph extends TextObject {
 		int		anchorInsertionPoint = 0;
 		
 		// get the Shape for this glyph
-		GlyphVector gv = this.font.createGlyphVector( frc, this.glyph );
+		GlyphVector gv = this.pfont.findFont().createGlyphVector( frc, this.glyph );
 		Shape outline = gv.getOutline();
 		
 		// store the glyph's logical buonds information
@@ -416,7 +418,8 @@ public class TextObjectGlyph extends TextObject {
 						dx = mid.x - lastAnchor.x;
 						dy = mid.y - lastAnchor.y;
 						dist = Math.sqrt((dx*dx) + (dy*dy));
-				 	 	if ( (this.font.getSize()/dist) < 21 ) {
+						// TODO make sure this getSize() returns the correct size when the PFont size and the actual size don't match
+				 	 	if ( (this.pfont.findFont().getSize()/dist) < 21 ) {
 					  		// if this is the case, then the lastAnchor has to be
 					 		// added as a control point.  However it has to be
 					 		// inserted in the correct order in the list.
@@ -500,7 +503,7 @@ public class TextObjectGlyph extends TextObject {
         // Spaces are calculated differently because they don't have control
         // points in the same way as other glyphs.
         if ( getGlyph().equals(" ") ) {
-            Rectangle2D sb = this.font.getStringBounds(" ", frc);
+            Rectangle2D sb = this.pfont.findFont().getStringBounds(" ", frc);
             minX = sb.getMinX();
             minY = sb.getMinY();
             maxX = sb.getMaxX();

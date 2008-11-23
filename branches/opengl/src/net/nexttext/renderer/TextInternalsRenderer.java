@@ -25,9 +25,7 @@ import net.nexttext.*;
 /**
  * This renderer prints out the internals of the TextPage tree to the console.
  * 
- * <p>
- * It's good for debugging when you want to know what's going on.
- * </p>
+ * <p>It is useful for debugging when you want to know what's going on.</p>
  */
 /* $Id$ */
 public class TextInternalsRenderer extends TextPageRenderer {

@@ -19,9 +19,9 @@
 
 package net.nexttext.renderer;
 
-import java.awt.*;
 import net.nexttext.*;
 import net.nexttext.property.*;
+import processing.core.*;
 
 /**
  * Traverses the TextObject hierarchy and draws every object's velocity as a
@@ -30,30 +30,49 @@ import net.nexttext.property.*;
  */
 /* $Id$ */
 public class VelocityRenderer extends TextPageRenderer {
-
-    Graphics2D g2;
-    Color      color;
-    int        scale;
+    private int color;
+    private int scale;
 
     /**
-     * Constructs a RenderVelocity callback. Color is the color that will be
-     * used to render the vector. Scale is a scalar that will be used to make
-     * the vector proportionally larger. This is useful since in many cases
-     * (x,y) values for velocity are often in the range 0~5.
+     * Builds a VelocityRenderer.
+     * 
+     * @param p the parent PApplet
+     * @param color the color that will be used to render the vector
+     * @param scale a scalar that will be used to make the vector proportionally
+     *  larger. This is useful since (x,y) values for velocity are often in the
+     *  range 0~5.
      */
-
-    public VelocityRenderer(Component canvas, Graphics2D g2, Color color,
-            int scale) {
-        super(canvas);
-        this.g2 = g2;
+    public VelocityRenderer(PApplet p, int color, int scale) {
+        super(p);
         this.color = color;
         this.scale = scale;
     }
+    
+    /**
+     * Builds a VelocityRenderer.
+     * 
+     * @param p the parent PApplet
+     * @param r the red value of the color that will be used to render the vector
+     * @param g the green value of the color that will be used to render the vector
+     * @param b the blue value of the color that will be used to render the vector
+     * @param scale a scalar that will be used to make the vector proportionally
+     *  larger. This is useful since (x,y) values for velocity are often in the
+     *  range 0~5.
+     */
+    public VelocityRenderer(PApplet p, int r, int g, int b, int scale) {
+        this(p, p.color(r, g, b), scale);
+    }
 
+    /**
+     * Traverses the TextObject hierarchy and renders a velocity vector for any
+     * TextObject having a Velocity property.
+     * 
+     * @param textPage the TextPage to render
+     */
     public void renderPage(TextPage textPage) {
         TextObjectIterator toi = textPage.getTextRoot().iterator();
-        while (toi.hasNext()) {
 
+        while (toi.hasNext()) {
             TextObject to = toi.next();
 
             Vector3Property velProp = (Vector3Property) to
@@ -62,12 +81,29 @@ public class VelocityRenderer extends TextPageRenderer {
             if (velProp != null) {
                 Vector3 vel = velProp.get();
                 Vector3 pos = to.getPositionAbsolute();
-
                 vel.scalar(scale);
+                
+                // save the color properties
+                boolean stroke = p.g.stroke;
+                int strokeColor = p.g.strokeColor;
+                boolean fill = p.g.fill;
+                int fillColor = p.g.fillColor;
+                
+                // draw the line
+                p.stroke(color);
+                p.noFill();
+                p.line((float)pos.x, (float)pos.y, (float)(pos.x + vel.x), (float)(pos.y + vel.y));
+                
+                // restore saved properties
+                if (stroke) 
+                    p.stroke(strokeColor);
+                else 
+                    p.noStroke();
 
-                g2.setColor(color);
-                g2.drawLine((int) pos.x, (int) pos.y, (int) (pos.x + vel.x),
-                        (int) (pos.y + vel.y));
+                if (fill) 
+                    p.fill(fillColor);
+                else 
+                    p.noFill();
             }
         }
     }

@@ -21,28 +21,50 @@ package net.nexttext.renderer;
 
 import java.awt.*;
 import net.nexttext.*;
+import processing.core.*;
 
 /**
  * Traverses the TextObject hierarchy and draws every object's bounding box.
  */
 /* $Id$ */
 public class BoundingBoxRenderer extends TextPageRenderer {
-    Graphics2D g2;
-    Color      boxColor;
-    boolean    doGlyphs;
-    boolean    doGroups;
-
-    public BoundingBoxRenderer(Component canvas, Graphics2D g2, Color boxColor,
-            boolean doGlyphs, boolean doGroups) {
-        super(canvas);
-        this.g2 = g2;
+    int boxColor;
+    boolean doGlyphs;
+    boolean doGroups;
+    
+    /**
+     * Builds a BoundingBoxRenderer.
+     * 
+     * @param p the parent PApplet
+     * @param boxColor the color that will be used to render the boxes
+     * @param doGlyphs whether or not to draw bounding boxes around the TextObjectGlyphs
+     * @param doGroups whether or not to draw bounding boxes around the TextObjectGroups
+     */
+    public BoundingBoxRenderer(PApplet p, int boxColor, boolean doGlyphs, boolean doGroups) {
+        super(p);
         this.boxColor = boxColor;
         this.doGlyphs = doGlyphs;
         this.doGroups = doGroups;
     }
+    
+    /**
+     * Builds a BoundingBoxRenderer.
+     * 
+     * @param p the parent PApplet
+     * @param rColor the red value of the color that will be used to render the boxes
+     * @param gColor the green value of the color that will be used to render the boxes
+     * @param bColor the blue value of the color that will be used to render the boxes
+     * @param doGlyphs whether or not to draw bounding boxes around the TextObjectGlyphs
+     * @param doGroups whether or not to draw bounding boxes around the TextObjectGroups
+     */
+    public BoundingBoxRenderer(PApplet p, int rColor, int gColor, int bColor, boolean doGlyphs, boolean doGroups) {
+        this(p, p.color(rColor, gColor, bColor), doGlyphs, doGroups);
+    }
 
     /**
-     * Traverse the TextObject tree and render all of its glyphs.
+     * Traverse the TextObject tree and render all of its elements.
+     * 
+     * @param textPage the TextPage to render
      */
     public void renderPage(TextPage textPage) {
         TextObjectGroup root = textPage.getTextRoot();
@@ -51,16 +73,44 @@ public class BoundingBoxRenderer extends TextPageRenderer {
             TextObject to = toi.next();
 
             if (to != root) {
-                if ((to instanceof TextObjectGlyph && doGlyphs)
-                        || (to instanceof TextObjectGroup && doGroups)) {
+                if ((to instanceof TextObjectGlyph && doGlyphs) || (to instanceof TextObjectGroup && doGroups)) {
                     renderTextObject(to);
                 }
             }
         }
     }
 
+    /**
+     * Renders a bounding box for the TextObject.
+     * 
+     * @param to The TextObject to render
+     */
     private void renderTextObject(TextObject to) {
-        g2.setColor(boxColor);
-        g2.draw(to.getBoundingPolygon());
+        // save the color and rect properties
+        boolean stroke = p.g.stroke;
+        int strokeColor = p.g.strokeColor;
+        boolean fill = p.g.fill;
+        int fillColor = p.g.fillColor;
+        int rectMode = p.g.rectMode;
+        
+        // draw the bounding box
+        Rectangle bounds = to.getBounds();
+        p.rectMode(PApplet.CORNER);
+        p.stroke(boxColor);
+        p.noFill();
+        p.rect(bounds.x, bounds.y, bounds.width, bounds.height);
+        
+        // restore saved properties
+        if (stroke) 
+            p.stroke(strokeColor);
+        else 
+            p.noStroke();
+
+        if (fill) 
+            p.fill(fillColor);
+        else 
+            p.noFill();
+        
+        p.rectMode(rectMode);
     }
 }

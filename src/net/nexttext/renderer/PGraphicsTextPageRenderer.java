@@ -19,16 +19,9 @@
 
 package net.nexttext.renderer;
 
-import java.awt.Component;
-import java.awt.Graphics2D;
-import java.awt.Shape;
-import java.awt.font.FontRenderContext;
-import java.awt.font.GlyphVector;
-import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.PathIterator;
 import java.util.Iterator;
-import java.util.Stack;
 
 import javax.media.opengl.*;
 import javax.media.opengl.glu.*;
@@ -42,28 +35,27 @@ import net.nexttext.property.Vector3Property;
 import net.nexttext.property.Vector3PropertyList;
 
 import processing.core.*;
-import processing.opengl.*;
 
 /**
+ * Renders the text stored in a TextPage as glyphs.
  * 
- * Renders the text stored in a text page.
- * 
- * <p>
- * This TextPage renderer is based on the Java2D API.
- * </p>
- * 
+ * <p>This TextPage renderer uses the parent PApplet's native drawing functions
+ * to render glyphs. If the glyphs to be rendered are deformed, their shapes are
+ * tesselated using the GLU tesselator from the OpenGL library.</p>
  */
 /* $Id$ */
 public class PGraphicsTextPageRenderer extends TextPageRenderer {
-    protected PApplet p;
-    
-    GLU glu;
-    TessCallback tessCallback;
-    GLUtessellator tobj;
+    protected GLU glu;
+    protected TessCallback tessCallback;
+    protected GLUtessellator tobj;
 
+    /**
+     * Builds a TextPageRenderer.
+     * 
+     * @param p the parent PApplet
+     */
     public PGraphicsTextPageRenderer(PApplet p) {
         super(p);
-        this.p = p;
         
         glu = new GLU();
         tobj = glu.gluNewTess();
@@ -76,17 +68,16 @@ public class PGraphicsTextPageRenderer extends TextPageRenderer {
     }
 
     /**
-     * 
      * The rendering loop. Takes as input a TextPage and traverses its root
      * node, rendering all the TextObjectGlyph objects along the way.
      * 
+     * @param textPage the TextPage to render
      */
     public void renderPage(TextPage textPage) {
         // When resizing, it's possible to lose the reference to the graphics
         // context, so we skip rendering the frame.
         if (p.g == null) {
-            System.out.println(("Skip rendering frame because the graphics "
-                    + "context was lost temporarily."));
+            System.out.println(("Skipping rendering frame because the graphics context was lost temporarily."));
         }
 
         else if (textPage.getTextRoot() == null) {
@@ -95,34 +86,34 @@ public class PGraphicsTextPageRenderer extends TextPageRenderer {
 
         // traverse the TextObject hierarchy
         else {
-            //AffineTransform original = g2.getTransform();
             traverse(textPage.getTextRoot());
-            //g2.setTransform(original);
         }
-    } // end rendering
+    }
 
     /**
-     * Traverse the TextObject tree and render all of its glyphs.
+     * Traverse the TextObject tree to render all of its glyphs.
+     * 
+     * <p>The tree is traversed using a variable to point at the current node
+     * being processed. TextObjects specify their rotation and position
+     * relative to their parent, which is handled by registering coordinate
+     * system changes with the drawing surface as the tree is traversed.</p>
+     * 
+     * Currently, rendering is not synchronized with modifications to the
+     * TextObjectTree. This is dodgy, but gives a performance boost, so will 
+     * stay that way for the moment. However, it affects this method, because we
+     * can't assume that the tree is always well structured.</p>
+     * 
+     * <p>Transformations are stored in a stack so that they can be undone as
+     * needed. It is not appropriate to use the position of the TextObject to 
+     * undo the transformation, because this may have changed due to the lack of
+     * synchronization.</p>
+     * 
+     * @param root the TextObject node to traverse
      */
     protected void traverse(TextObject root) {
-        // The tree is traversed using a variable to point at the current node
-        // being processed. TextObjects specify their rotation and position
-        // relative to their parent, which is handled by registering coordinate
-        // system changes with the Graphics2D object as the tree is traversed.
-
-        // Currently rendering is not synchronized with modifications to the
-        // TextObjectTree. This is dodgy, but gives a performance boost, so
-        // will stay that way for the moment. However, it affects this method,
-        // because we can't assume that the tree is always well structured.
-
-        // Transformations are stored in a stack so that they can be undone as
-        // needed. It is not appropriate to use the position of the TextObject
-        // to undo the transformation, because this may have changed due to the
-        // lack of synchronization.
-
         TextObject current = root;
         do {
-            // Draw any glyphs.
+            // Draw any glyphs
             if (current instanceof TextObjectGlyph) {
                 enterCoords(current);
                 renderGlyph((TextObjectGlyph) current);
@@ -163,13 +154,14 @@ public class PGraphicsTextPageRenderer extends TextPageRenderer {
     }
 
     /**
-     * Transform the Graphics2D into the coordinates of the given TextObject.
+     * Transform the drawing surface into the coordinates of the given 
+     * TextObject.
      * 
-     * <p>
-     * Once this transformation is done, the TextObject and any of it's children
-     * can be written directly to the Graphics2D without having to handle
-     * position or rotation.
-     * </p>
+     * <p>Once this transformation is done, the TextObject and any of its 
+     * children can be drawn directly to the PApplet without having to handle
+     * position or rotation.</p>
+     * 
+     * @param node the TextObject holding the translation and rotation info
      */
     protected void enterCoords(TextObject node) {
         p.pushMatrix();
@@ -183,11 +175,9 @@ public class PGraphicsTextPageRenderer extends TextPageRenderer {
     }
 
     /**
-     * Transform the Graphics2D out of the coordinates on top of the stack.
+     * Transform the drawing surface out of the coordinates on top of the stack.
      * 
-     * <p>
-     * This undoes the change of enterCoords().
-     * </p>
+     * <p>This undoes the change of enterCoords(TextObject node).</p>
      */
     protected void exitCoords() {
         p.popMatrix();
@@ -196,8 +186,7 @@ public class PGraphicsTextPageRenderer extends TextPageRenderer {
     /**
      * Renders a TextObjectGlyph.
      * 
-     * @param glyph The TextObjectGlyph
-     * @param g2 The drawing context
+     * @param glyph The TextObjectGlyph to render
      */
     protected void renderGlyph(TextObjectGlyph glyph) {
         // save the text properties
@@ -239,7 +228,7 @@ public class PGraphicsTextPageRenderer extends TextPageRenderer {
                     int contour[] = (int[]) it.next();
 
                     Vector3Property firstPoint = vertices.get(contour[0]);
-                    // move the pen to the begining of the contour
+                    // move the pen to the beginning of the contour
                     gp.moveTo((float) firstPoint.getX(), (float) firstPoint
                             .getY());
 
@@ -306,7 +295,9 @@ public class PGraphicsTextPageRenderer extends TextPageRenderer {
     } // end renderGlyph
 
     /**
-     * Strokes the glyph using native P5 drawing calls.
+     * Strokes the glyph using native Processing drawing functions.
+     * 
+     * @param gp the outline of the glyph
      */
     protected void strokePath(GeneralPath gp) {
         // six element array received from the Java2D path iterator
@@ -342,6 +333,8 @@ public class PGraphicsTextPageRenderer extends TextPageRenderer {
 
     /**
      * Fills the glyph using the tesselator.
+     * 
+     * @param gp the outline of the glyph
      */
     protected void fillPath(GeneralPath gp) {
         // six element array received from the Java2D path iterator
@@ -419,6 +412,10 @@ public class PGraphicsTextPageRenderer extends TextPageRenderer {
         glu.gluTessEndPolygon(tobj);
     }
 
+    /**
+     * This tesselator callback uses native Processing drawing functions to 
+     * execute the incoming commands.
+     */
     public class TessCallback extends GLUtessellatorCallbackAdapter {
         
         public void begin(int type) {

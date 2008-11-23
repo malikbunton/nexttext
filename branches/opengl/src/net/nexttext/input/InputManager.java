@@ -38,14 +38,15 @@ public class InputManager {
     // The hash sources are kept in.
     HashMap sources = new HashMap();
     
-    /** Class constructor. 
-     * Creates the default input sources (mouse and keyboard).
+    /** 
+     * Builds an InputManager.
 	 *
-	 * @param component	the component the listeners are attached to
+	 * @param mouse the default Mouse InputSource
+	 * @param keyboard the default Keyboard InputSource
 	 */
-    public InputManager(Component component){ 
-	    add("Mouse", new MouseDefault(component));          	
-        add("Keyboard", new KeyboardDefault(component));          		 	
+    public InputManager(Mouse mouse, Keyboard keyboard) { 
+	    add("Mouse", mouse);          	
+        add("Keyboard", keyboard);          		 	
 	 }
     
     /**

@@ -36,10 +36,8 @@ import processing.core.*;
 import processing.opengl.*;
 
 import net.nexttext.behaviour.AbstractBehaviour;
-import net.nexttext.input.InputManager;
+import net.nexttext.input.*;
 import net.nexttext.renderer.*;
-import net.nexttext.processing.FontManager;
-import net.nexttext.processing.ProcessingMouse;
 import net.nexttext.property.ColorProperty;
 import net.nexttext.property.StrokeProperty;
 
@@ -57,7 +55,8 @@ import net.nexttext.property.StrokeProperty;
 public class Book {
 
 	public static TextObjectBuilder toBuilder;
-    public static ProcessingMouse mouse;
+    public static MouseDefault mouse;
+    public static KeyboardDefault keyboard;
     
     private PApplet p;   
 
@@ -90,7 +89,6 @@ public class Book {
         pages = new LinkedHashMap();
     	behaviourList = new LinkedList();
     	textRoot = new TextObjectRoot(this);
-        inputs = new InputManager(defaultRenderer.getCanvas());
         spatialList = new SpatialList();
         
         this.p = p;
@@ -101,8 +99,11 @@ public class Book {
         
         // initialize the TextObjectBuilder
         toBuilder = new TextObjectBuilder(this, defaultTextPage);
-        // initialize the ProcessingMouse
-        mouse = new ProcessingMouse(p);
+        
+        // initialize the inputs
+        mouse = new MouseDefault(p);
+        keyboard = new KeyboardDefault(p);
+        inputs = new InputManager(mouse, keyboard);
     }
     
 	///////////////////////////////////////////////////////////////////////////
@@ -232,17 +233,6 @@ public class Book {
     ///////////////////////////////////////////////////////////////////////////
 	// Font loading and setting methods 
 	
-    
-    /**
-     * Loads the font with the given filename from the 'data' folder of the sketch.
-     * 
-     * @param filename
-     * 
-     * @return the loaded font
-     */
-    public Font loadFont(String filename) {
-    	return FontManager.loadFont(p, filename);
-    }
     
     /**
      * Sets the font of the TextObjectBuilder based on the PApplet's active font.

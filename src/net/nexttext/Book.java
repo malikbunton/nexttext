@@ -22,7 +22,6 @@ package net.nexttext;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.geom.AffineTransform;
 import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.HashSet;
@@ -32,14 +31,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import processing.core.*;
-import processing.opengl.*;
-
-import net.nexttext.behaviour.AbstractBehaviour;
+import net.nexttext.behaviour.*;
 import net.nexttext.input.*;
 import net.nexttext.renderer.*;
 import net.nexttext.property.ColorProperty;
 import net.nexttext.property.StrokeProperty;
+
+import processing.core.*;
 
 /**
  * The container for the NextText for Processing data and window.
@@ -71,9 +69,9 @@ public class Book {
     /** The frame number, incremented each frame by the Simulator. */
     public void incrementFrameCount() { frameCount++; }
 	
-    protected LinkedHashMap pages;
+    protected LinkedHashMap<String, TextPage> pages;
     protected PGraphicsTextPageRenderer defaultRenderer;
-    protected List behaviourList;
+    protected List<AbstractBehaviour> behaviourList;
     protected TextObjectRoot textRoot;	// the root of the TextObject hierarchy
     protected InputManager inputs;
     protected SpatialList spatialList;
@@ -86,8 +84,8 @@ public class Book {
      */
     public Book(PApplet p) {
     	defaultRenderer = new PGraphicsTextPageRenderer(p); 
-        pages = new LinkedHashMap();
-    	behaviourList = new LinkedList();
+        pages = new LinkedHashMap<String, TextPage>();
+    	behaviourList = new LinkedList<AbstractBehaviour>();
     	textRoot = new TextObjectRoot(this);
         spatialList = new SpatialList();
         
@@ -108,7 +106,7 @@ public class Book {
     
 	///////////////////////////////////////////////////////////////////////////
 	
-	private Set objectsToRemove = new HashSet();
+	private Set<TextObject> objectsToRemove = new HashSet<TextObject>();
 
     /**
      * Remove a text object and any children from the tree.
@@ -139,8 +137,8 @@ public class Book {
 	    
 	    if ( objectsToRemove.size() > 0 ) {
 	        
-	        for ( Iterator i = objectsToRemove.iterator(); i.hasNext(); ) {
-                TextObject next = (TextObject) i.next();
+	        for ( Iterator<TextObject> i = objectsToRemove.iterator(); i.hasNext(); ) {
+                TextObject next = i.next();
                 if (next instanceof TextObjectGlyph) {
                     removeObjectInner(next);
                 } else if (next instanceof TextObjectGroup) {
@@ -165,9 +163,9 @@ public class Book {
 		getSpatialList().remove( to );
 		// traverse the behaviour list.  try to remove the object from each
 		// active behaviour
-    	Iterator i = getBehaviourList().iterator();
+    	Iterator<AbstractBehaviour> i = behaviourList.iterator();
     	while (i.hasNext()) {
-    	    AbstractBehaviour b = (AbstractBehaviour)i.next();
+    	    AbstractBehaviour b = i.next();
     	    b.removeObject(to);    	        	    					
     	}
 		// detach the object from the tree
@@ -183,9 +181,9 @@ public class Book {
      */
     public synchronized void step() {
         // apply the behaviours
-        Iterator i = behaviourList.iterator();
+        Iterator<AbstractBehaviour> i = behaviourList.iterator();
         while (i.hasNext()) {
-            AbstractBehaviour b = (AbstractBehaviour)i.next();
+            AbstractBehaviour b = i.next();
             b.behaveAll(); 
         }
 
@@ -204,10 +202,10 @@ public class Book {
      */
     public void draw() {
         // render all the pages
-        Collection pages = getPages();
-        Iterator i = pages.iterator();
+        Collection<TextPage> pages = getPages();
+        Iterator<TextPage> i = pages.iterator();
         while (i.hasNext()) {
-            TextPage page = (TextPage)i.next();
+            TextPage page = i.next();
             page.render();
         }
     }
@@ -495,9 +493,9 @@ public class Book {
     /** Returns the page renderer */
 	public TextPageRenderer getRenderer() { return defaultRenderer; }
     /** Returns the page set */
-    public Collection getPages() { return pages.values(); }
+    public Collection<TextPage> getPages() { return pages.values(); }
 	/** Returns the BehaviourList */
-	public List getBehaviourList() { return behaviourList; };
+	public List<AbstractBehaviour> getBehaviourList() { return behaviourList; };
 	/** 
      * Get the root of the TextObject hierarchy.  Any changes to this tree
      * must be synchronized on the book. Do not add textObjects as children of 
@@ -576,13 +574,10 @@ public class Book {
      * Removes all the TextObjects from all the TextPages in the Book, except for all the TextObjectRoots.
      */
     public void clear() {
-    	Iterator i = pages.values().iterator();
+    	Iterator<TextPage> i = pages.values().iterator();
         while (i.hasNext()) {
-        	TextPage page = (TextPage)i.next();
-        	if (page instanceof TextPage) {
-        		TextPage textPage = (TextPage)page;
-        		removeChildren(textPage.getTextRoot());
-        	}
+        	TextPage page = i.next();
+            removeChildren(page.getTextRoot());
         }
     }
     
@@ -592,7 +587,7 @@ public class Book {
      */
     public void clearPage(String pageName) {
     	if (pages.get(pageName) instanceof TextPage) {
-    		TextPage textPage = (TextPage)pages.get(pageName);
+    		TextPage textPage = pages.get(pageName);
     		removeChildren(textPage.getTextRoot());
     	}
     }

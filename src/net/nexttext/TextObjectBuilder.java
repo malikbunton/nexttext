@@ -22,7 +22,6 @@ package net.nexttext;
 import net.nexttext.behaviour.AbstractBehaviour;
 import net.nexttext.property.Property;
 
-import java.awt.Font;
 import java.awt.Rectangle;
 import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphVector;
@@ -70,7 +69,7 @@ public class TextObjectBuilder {
     //////////////////////////////////////////////////////////////////////
     // Internal Members
 
-    // The book is used for synchronization of updates to the
+    // The book is used for synchronisation of updates to the
     // TextObjectHierarchy.
     Book book;
     
@@ -147,7 +146,7 @@ public class TextObjectBuilder {
     public TextObjectGroup getParent() { return parent; }
 
 
-    Set glyphBehaviours = new HashSet();
+    Set<AbstractBehaviour> glyphBehaviours = new HashSet<AbstractBehaviour>();
     /** Created glyphs will get this behaviour. */
     public void addGlyphBehaviour(AbstractBehaviour b) { glyphBehaviours.add(b); }
     /** Created glyphs will no longer get this behaviour. */
@@ -155,12 +154,12 @@ public class TextObjectBuilder {
     /** Created glyphs will no longer get any behaviours. */
     public void removeAllGlyphBehaviours() { glyphBehaviours.clear(); }
     /** Behaviours to be added to each glyph. */
-    public Set getGlyphBehaviours() {
+    public Set<AbstractBehaviour> getGlyphBehaviours() {
         return Collections.unmodifiableSet(glyphBehaviours);
     }
 
 
-    Set groupBehaviours = new HashSet();
+    Set<AbstractBehaviour> groupBehaviours = new HashSet<AbstractBehaviour>();
     /** Created groups will get this behaviour. */
     public void addGroupBehaviour(AbstractBehaviour b) { groupBehaviours.add(b); }
     /** Created groups will no longer get this behaviour. */
@@ -168,12 +167,12 @@ public class TextObjectBuilder {
     /** Created groups will no longer get any behaviours. */
     public void removeAllGroupBehaviours() { groupBehaviours.clear(); }
     /** Behaviours to be added to each group. */
-    public Set getGroupBehaviours() {
+    public Set<AbstractBehaviour> getGroupBehaviours() {
         return Collections.unmodifiableSet(groupBehaviours);
     }
 
 
-    Map glyphProperties = new HashMap();
+    Map<String, Property> glyphProperties = new HashMap<String, Property>();
     /** Created glyphs will get this property. */
     public void addGlyphProperty(String name, Property p) {
         glyphProperties.put(name, p);
@@ -186,7 +185,7 @@ public class TextObjectBuilder {
     public void removeAllGlyphProperties() { glyphProperties.clear(); }
 
 
-    Map groupProperties = new HashMap();
+    Map<String, Property> groupProperties = new HashMap<String, Property>();
     /** Created groups will get this property. */
     public void addGroupProperty(String name, Property p) {
         groupProperties.put(name, p);
@@ -436,26 +435,26 @@ public class TextObjectBuilder {
             // they can be synchronized together, and in case they care about
             // the structure.
 
-            Iterator i = groupBehaviours.iterator();
+            Iterator<AbstractBehaviour> i = groupBehaviours.iterator();
             while (i.hasNext()) {
-                ((AbstractBehaviour) i.next()).addObject(newGroup);
+                i.next().addObject(newGroup);
             }
 
             TextObject child = newGroup.getLeftMostChild();
             while (child != null) {
             	if (!isSentence) {
             		// we can assume child is a TextObjectGlyph because of the way build() works
-            		Iterator bI = glyphBehaviours.iterator();
+            		Iterator<AbstractBehaviour> bI = glyphBehaviours.iterator();
             		while (bI.hasNext()) {
-            			((AbstractBehaviour) bI.next()).addObject(child);
+            			bI.next().addObject(child);
             		}
             	} else {
             		// we can assume grandChild is a TextObjectGlyph because of the way buildSentence() works
             		TextObject grandChild = ((TextObjectGroup)child).getLeftMostChild();
             		while (grandChild != null) {
-            			Iterator bI = glyphBehaviours.iterator();
+            			Iterator<AbstractBehaviour> bI = glyphBehaviours.iterator();
                 		while (bI.hasNext()) {
-                			((AbstractBehaviour) bI.next()).addObject(grandChild);
+                			bI.next().addObject(grandChild);
                 		}
                 		grandChild = grandChild.getRightSibling();
             		}

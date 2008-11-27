@@ -19,7 +19,6 @@
 
 package net.nexttext;
 
-import java.awt.Font;
 import java.awt.Polygon;
 import java.awt.Shape;
 import java.awt.font.FontRenderContext;
@@ -72,7 +71,7 @@ import processing.core.PFont;
 /* $Id$ */ 
 public class TextObjectGlyph extends TextObject {
 	
-    // The FontRenderContext is necessary for determing glyph outlines, but is
+    // The FontRenderContext is necessary for determining glyph outlines, but is
     // never modified.
     static FontRenderContext frc = new FontRenderContext(null, false, false);
 
@@ -130,7 +129,7 @@ public class TextObjectGlyph extends TextObject {
 	 * @param position  A Vector3 representing the glyph's relative position
 	 */
     public TextObjectGlyph(String glyph, PFont font, Vector3 position) {
-        this(glyph, font, new HashMap(0), position);
+        this(glyph, font, new HashMap<String, Property>(0), position);
     }
 
 	/**
@@ -141,7 +140,7 @@ public class TextObjectGlyph extends TextObject {
 	 * @param pos       A Vector3 representing the glyph's relative position
 	 * @param props     Initial properties for the glyph.
 	 */
-	public TextObjectGlyph(String glyph, PFont font, Map props, Vector3 pos) {
+	public TextObjectGlyph(String glyph, PFont font, Map<String, Property> props, Vector3 pos) {
         super(props, pos);
 
 	 	this.glyph 	= glyph;
@@ -195,7 +194,7 @@ public class TextObjectGlyph extends TextObject {
 	public void setGlyph( String glyph ) {
 		
 		// XXXBUG: should we even allow setGlyph?... Issues with character spacing are
-		// coming to mind.   Maybe notifiy the parent so it can layout other
+		// coming to mind.   Maybe notify the parent so it can layout other
 		// characters accordingly.
 		this.glyph = glyph;
 
@@ -291,7 +290,7 @@ public class TextObjectGlyph extends TextObject {
 		// a temporary list to store vertex indices for each contour (once 
 		// the contour is closed, this Vector will be converted to an array
 		// and stored into the Contour list.
-		Vector tmpContour = new Vector();
+		Vector<Integer> tmpContour = new Vector<Integer>();
 				
 		// used to receive the list of points from PathIterator.currentSegment()
 		double 	points[] = new double[6];  
@@ -314,7 +313,7 @@ public class TextObjectGlyph extends TextObject {
 		GlyphVector gv = this.pfont.findFont().createGlyphVector( frc, this.glyph );
 		Shape outline = gv.getOutline();
 		
-		// store the glyph's logical buonds information
+		// store the glyph's logical bounds information
 		logicalBounds = gv.getLogicalBounds();
 		
 	 	// no flattening done at the moment, just iterate through all the 
@@ -331,14 +330,14 @@ public class TextObjectGlyph extends TextObject {
 				case PathIterator.SEG_MOVETO:
 					
 					// start a new tmpContour vector
-					tmpContour = new Vector();
+					tmpContour = new Vector<Integer>();
 				 	// get the starting point for this contour	
 					Vector3 startingPoint = new Vector3( points[0], points[1] );
 					// store the point in the list of vertices
 					vertices.add( new Vector3Property( startingPoint) );
 					// store this point in the current tmpContour and increment
 					// the vertices index
-					tmpContour.add( new Integer(vertexIndex) );
+					tmpContour.add( vertexIndex );
 					vertexIndex++;
 					// update temporary variables used for backtracking
 					lastAnchor = startingPoint;
@@ -362,8 +361,8 @@ public class TextObjectGlyph extends TextObject {
 					// times)
 					if ( previousType != PathIterator.SEG_LINETO ) {
 						vertices.add( new Vector3Property(lastAnchor) );
-						tmpContour.add( new Integer(vertexIndex) );
-						tmpContour.add( new Integer(vertexIndex) );
+						tmpContour.add( vertexIndex );
+						tmpContour.add( vertexIndex );
 						vertexIndex++;	
 					}
 				 
@@ -373,14 +372,14 @@ public class TextObjectGlyph extends TextObject {
 					Vector3 midPoint = new Vector3( (lastAnchor.x + endPoint.x)/2, 
 								 			  		(lastAnchor.y + endPoint.y)/2  );
 					vertices.add( new Vector3Property( midPoint) );
-					tmpContour.add( new Integer(vertexIndex) );
+					tmpContour.add( vertexIndex );
 					vertexIndex++;
 					
 					// finally, we must add the endPoint twice to the contour
 					// to preserve sharp corners
 					vertices.add( new Vector3Property( endPoint) );
-					tmpContour.add( new Integer(vertexIndex) );
-					tmpContour.add( new Integer(vertexIndex) );
+					tmpContour.add( vertexIndex );
+					tmpContour.add( vertexIndex );
 					vertexIndex++;
 				 	
 				 	// update variables used for backtracking
@@ -424,8 +423,8 @@ public class TextObjectGlyph extends TextObject {
 					 		// added as a control point.  However it has to be
 					 		// inserted in the correct order in the list.
 					  		vertices.add( new Vector3Property( lastAnchor) );
-					   		tmpContour.add( anchorInsertionPoint, new Integer( vertexIndex ) );
-					 		tmpContour.add( anchorInsertionPoint, new Integer( vertexIndex ) );
+					   		tmpContour.add( anchorInsertionPoint, vertexIndex );
+					 		tmpContour.add( anchorInsertionPoint, vertexIndex );
 					 		vertexIndex++;
 					 	} 
 					}
@@ -439,7 +438,7 @@ public class TextObjectGlyph extends TextObject {
 					// point for the quad.  The actual anchor points will be 
 					// interpolated at runtime to preserve curve continuity.
 					vertices.add( new Vector3Property( controlPoint) );
-					tmpContour.add( new Integer(vertexIndex) );
+					tmpContour.add( vertexIndex );
 					vertexIndex++;
 						
 					// update temporary variables used for backtracking					
@@ -453,10 +452,10 @@ public class TextObjectGlyph extends TextObject {
 					// A SEG_CLOSE signifies the end of a contour, therefore
 					// convert tmpContour into a new array of correct size
 					int contour[] = new int[tmpContour.size()];
-					Iterator it = tmpContour.iterator();
+					Iterator<Integer> it = tmpContour.iterator();
 					int i = 0;
 					while( it.hasNext() ) {
-						contour[i] = ((Integer)it.next()).intValue();
+						contour[i] = it.next();
 						i++;	
 					}
 					
@@ -512,8 +511,8 @@ public class TextObjectGlyph extends TextObject {
         } else {
             Vector3PropertyList vertices = getControlPoints();
 
-            for ( Iterator i = vertices.iterator(); i.hasNext(); ) {
-                Vector3Property vertex = (Vector3Property)i.next();
+            for ( Iterator<Vector3Property> i = vertices.iterator(); i.hasNext(); ) {
+                Vector3Property vertex = i.next();
                 minX = Math.min(vertex.getX(), minX);
                 minY = Math.min(vertex.getY(), minY);
                 maxX = Math.max(vertex.getX(), maxX);

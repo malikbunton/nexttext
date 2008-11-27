@@ -63,7 +63,7 @@ public class TextInternalsRenderer extends TextPageRenderer {
 
     void processProperties(TextObject node) {
         String pp = prefix + "    ";
-        Iterator i = node.getPropertyNames().iterator();
+        Iterator<String> i = node.getPropertyNames().iterator();
         while (i.hasNext()) {
             String name = (String) i.next();
             System.out.println(pp + name + " = " + node.getProperty(name));

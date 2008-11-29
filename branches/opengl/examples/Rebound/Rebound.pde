@@ -41,7 +41,7 @@ void setup() {
   book.addGlyphBehaviour(throwAround.makeBehaviour());
   
   // init and set the font
-  cheboygan = loadFont("Cheboygan.vlw");
+  cheboygan = createFont("Cheboygan.ttf", 48, true);
   textFont(cheboygan);
   textAlign(CENTER);
   

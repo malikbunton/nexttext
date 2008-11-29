@@ -54,11 +54,10 @@ void setup() {
   snakeMousePath = new SnakeMousePath(this, book, PATH_POINTDISTANCE);
   book.getInputs().add("SnakeMousePath", snakeMousePath);
   
-  font = loadFont("GillSans-UltraBold-36.vlw");
-  textFont(font, 36);
+  font = createFont("GillSans-UltraBold.ttf", 36, true);
+  textFont(font);
   noStroke();
-  //font = book.loadFont("GILSANUB.ttf").deriveFont(FONT_SIZE);
-
+  
   inSnakeActions = new Multiplexer();
   colorizeSelected = new Colorize(SELECTED_COLOR, COLOR_SPEED);
   inSnakeActions.add(colorizeSelected);

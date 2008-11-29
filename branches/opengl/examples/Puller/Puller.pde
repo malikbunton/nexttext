@@ -51,8 +51,8 @@ void setup() {
   book.addGroupBehaviour(reformOnThree);
 
   // init and set the font
-  gangOfThree = loadFont("GangofThree-28.vlw");
-  textFont(gangOfThree, 28);
+  gangOfThree = createFont("GangOfThree.ttf", 28, true);
+  textFont(gangOfThree);
   textAlign(CENTER);
   
   // set the text colour

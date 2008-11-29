@@ -27,8 +27,8 @@ void setup() {
   book = new Book(this);
 
   // load and set the font
-  font = loadFont("GeometricBlack.vlw");
-  textFont(font, 48);
+  font = createFont("GeometricBlack.ttf", 48, true);
+  textFont(font);
   fill(255);
   stroke(241, 100, 34);
  

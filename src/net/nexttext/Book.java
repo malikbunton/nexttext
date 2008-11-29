@@ -240,16 +240,21 @@ public class Book {
         if (pf == null) {
             PGraphics.showException("Use textFont() before Book.addText()");
         }
-        Font f = pf.findFont();
+        
+        // try setting the Font from the PFont
+        Font f = pf.getFont();
+        if (f == null) {
+            // try setting the Font directly
+            PGraphics.showWarning("You should load your font using createFont() instead of loadFont() so that your sketch works on machines that don't have the font installed!");
+            f = pf.findFont();
+        }
         
         if (f == null) {
             PGraphics.showException("Cannot find the native version of the active PFont. Make sure it is installed on this machine!");
         }
         
         toBuilder.setTextAlign(p.g.textAlign);
-        // TODO add font size in here somehow
         toBuilder.setFont(pf);
-        //toBuilder.setFont(FontManager.deriveFont(f, p.g.textSize));
     }
     
     ///////////////////////////////////////////////////////////////////////////

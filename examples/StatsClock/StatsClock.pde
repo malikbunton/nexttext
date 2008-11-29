@@ -82,8 +82,8 @@ void setup() {
   }
 
   // init and set the font
-  steelfish = loadFont("Steelfish.vlw");
-  textFont(steelfish, 48);
+  steelfish = createFont("Steelfish.ttf", 48, true);
+  textFont(steelfish);
   
   // add the starting stats
   addStat(SECOND);

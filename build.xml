@@ -1,20 +1,21 @@
-<project name="NextText Library for Processing" default="jar">
+<project name="NextText Library for Processing" default="package">
 	<!-- $Id$ -->
 	
 	<description>
-	    This project builds the NextText library for Processing.  Just run "ant" and it 
-	    will put a jar file in the lib directory.  This jar should be moved to 
-	    "path/to/processing/libraries/nexttext/library/" for use in the Processing IDE.
+	    This project builds the NextText library for Processing.  Just run "ant"
+		and it will put a ZIP file in the project directory. This file should be
+		unzipped and its contents moved to "path/to/processing/libraries" for 
+		use in the Processing IDE.
 	</description>
 		
 	<path id="processing.classpath">
-	    <pathelement location="/Developer/Applications/Java/Processing 0157.app/Contents/Resources/Java/core.jar"/>
+	    <pathelement location="/Developer/Applications/Java/Processing.app/Contents/Resources/Java/core.jar"/>
 	</path>
 	<path id="opengl.classpath">
-	    <pathelement location="/Developer/Applications/Java/Processing 0157.app/Contents/Resources/Java/libraries/opengl/library/opengl.jar"/>
+	    <pathelement location="/Developer/Applications/Java/Processing.app/Contents/Resources/Java/libraries/opengl/library/opengl.jar"/>
 	</path>
 	<path id="jogl.classpath">
-	    <pathelement location="/Developer/Applications/Java/Processing 0157.app/Contents/Resources/Java/libraries/opengl/library/jogl.jar"/>
+	    <pathelement location="/Developer/Applications/Java/Processing.app/Contents/Resources/Java/libraries/opengl/library/jogl.jar"/>
 	</path>
 
 	<target name="jar">

@@ -241,20 +241,22 @@ public class Book {
             PGraphics.showException("Use textFont() before Book.addText()");
         }
         
-        // try setting the Font from the PFont
-        Font f = pf.getFont();
-        if (f == null) {
-            // try setting the Font directly
-            PGraphics.showWarning("You should load your font using createFont() instead of loadFont() so that your sketch works on machines that don't have the font installed!");
-            f = pf.findFont();
-        }
-        
-        if (f == null) {
-            PGraphics.showException("Cannot find the native version of the active PFont. Make sure it is installed on this machine!");
-        }
+        Font f = loadFontFromPFont(pf);
         
         toBuilder.setTextAlign(p.g.textAlign);
-        toBuilder.setFont(pf);
+        toBuilder.setFont(pf, f);
+    }
+    
+    public static Font loadFontFromPFont(PFont pf) {
+     // try setting the Font from the PFont
+        Font f = pf.getFont();
+        if (f == null) {
+            f = pf.findFont();
+            if (f == null) {
+                PGraphics.showException("Cannot find the native version of the active PFont. Make sure it is installed on this machine!");
+            }
+        }
+        return f;
     }
     
     ///////////////////////////////////////////////////////////////////////////

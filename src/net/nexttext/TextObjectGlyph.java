@@ -21,6 +21,7 @@ package net.nexttext;
 
 import java.awt.Polygon;
 import java.awt.Shape;
+import java.awt.Font;
 import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphVector;
 import java.awt.geom.PathIterator;
@@ -77,8 +78,9 @@ public class TextObjectGlyph extends TextObject {
 
 	/** The character for this object.  This is a special property that is 
 	 * handled through its own get/set methods */
-	protected String 	glyph;
-	protected PFont		pfont;
+	protected String glyph;
+	protected PFont pfont;
+	protected Font font;
 	
 	/** A vector containing int[] arrays with indices to the Control Points property
 	 list.  These contours define the shape of the glyph */
@@ -115,36 +117,37 @@ public class TextObjectGlyph extends TextObject {
 	 * is inherited from the parent.
 	 *
 	 * @param glyph		A one character-long string 
-	 * @param font      A processing.core.PFont object 
+	 * @param pfont     A processing.core.PFont object 
 	 */
-	public TextObjectGlyph(String glyph, PFont font) {
- 		this(glyph, font, new Vector3(0,0,0));
+	public TextObjectGlyph(String glyph, PFont pfont) {
+ 		this(glyph, pfont, new Vector3(0,0,0));
 	}
 	
 	/**
 	 * Constructor with a specific position.
 	 *
 	 * @param glyph		A one character-long string 
-	 * @param font      A processing.core.PFont object 
+	 * @param pfont     A processing.core.PFont object 
 	 * @param position  A Vector3 representing the glyph's relative position
 	 */
-    public TextObjectGlyph(String glyph, PFont font, Vector3 position) {
-        this(glyph, font, new HashMap<String, Property>(0), position);
+    public TextObjectGlyph(String glyph, PFont pfont, Vector3 position) {
+        this(glyph, pfont, new HashMap<String, Property>(0), position);
     }
 
 	/**
 	 * Constructor with extra properties and a specific position.
 	 *
 	 * @param glyph		A one character-long string 
-	 * @param font      A processing.core.PFont object 
+	 * @param pfont     A processing.core.PFont object 
 	 * @param pos       A Vector3 representing the glyph's relative position
 	 * @param props     Initial properties for the glyph.
 	 */
-	public TextObjectGlyph(String glyph, PFont font, Map<String, Property> props, Vector3 pos) {
+	public TextObjectGlyph(String glyph, PFont pfont, Map<String, Property> props, Vector3 pos) {
         super(props, pos);
 
 	 	this.glyph 	= glyph;
-		this.pfont 	= font; 
+		this.pfont 	= pfont;
+		font = Book.loadFontFromPFont(pfont);
 
         properties.init("Control Points", new Vector3PropertyList());
         
@@ -206,10 +209,11 @@ public class TextObjectGlyph extends TextObject {
 	 * properties of the newly specified Font object.  This operation is rather
 	 * costly, so it should be used accordingly.
 	 */
-	public void setFont(PFont font) {
+	public void setFont(PFont pfont) {
         // Ideally setFont would attempt to preserve deformations.  However
         // that's a lot of work, so we have deferred it.
-		this.pfont = font;
+		this.pfont = pfont;
+		font = Book.loadFontFromPFont(pfont);
         glyphChanged();
 	}
 	
@@ -310,7 +314,7 @@ public class TextObjectGlyph extends TextObject {
 		int		anchorInsertionPoint = 0;
 		
 		// get the Shape for this glyph
-		GlyphVector gv = this.pfont.findFont().createGlyphVector( frc, this.glyph );
+		GlyphVector gv = font.createGlyphVector( frc, this.glyph );
 		Shape outline = gv.getOutline();
 		
 		// store the glyph's logical bounds information
@@ -418,7 +422,7 @@ public class TextObjectGlyph extends TextObject {
 						dy = mid.y - lastAnchor.y;
 						dist = Math.sqrt((dx*dx) + (dy*dy));
 						// TODO make sure this getSize() returns the correct size when the PFont size and the actual size don't match
-				 	 	if ( (this.pfont.findFont().getSize()/dist) < 21 ) {
+				 	 	if ( (font.getSize()/dist) < 21 ) {
 					  		// if this is the case, then the lastAnchor has to be
 					 		// added as a control point.  However it has to be
 					 		// inserted in the correct order in the list.

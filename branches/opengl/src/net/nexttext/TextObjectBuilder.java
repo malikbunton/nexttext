@@ -23,6 +23,7 @@ import net.nexttext.behaviour.AbstractBehaviour;
 import net.nexttext.property.Property;
 
 import java.awt.Rectangle;
+import java.awt.Font;
 import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphVector;
 
@@ -103,15 +104,20 @@ public class TextObjectBuilder {
     // Configurable parameters
 
     PFont pfont;
+    Font font;
     //Font font = new Font("courier", 0, 18);
     private Vector3 spaceOffset; // Width of a space character
     private Vector3 trackingOffset; // Space between two characters
     private Vector3 lineHeight;  // Height of a line
-    public void setFont(PFont font) { 
-        this.pfont = font;
-        
+    public void setFont(PFont pf) { 
+        Font f = Book.loadFontFromPFont(pf);
+        setFont(pf, f);
+    }
+    public void setFont(PFont pf, Font f) { 
+        pfont = pf;
+        font = f;
         FontRenderContext frc = new FontRenderContext(null, false, false);
-		GlyphVector sp = this.pfont.findFont().createGlyphVector( frc, " " );		
+		GlyphVector sp = f.createGlyphVector( frc, " " );		
 		spaceOffset = new Vector3( (int)sp.getLogicalBounds().getWidth(), 0,0);        
 		trackingOffset = new Vector3(0, 0, 0);
 		lineHeight = new Vector3( 0,(int)sp.getLogicalBounds().getHeight(),0);

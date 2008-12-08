@@ -40,17 +40,17 @@ import net.nexttext.property.ColorProperty;
 import processing.core.PFont;
 
 /**
- * TextObjectGlyph represents an individual glyph and it's vectorial outline in 
+ * TextObjectGlyph represents an individual glyph and its vectorial outline in 
  * a data structure that is understood by the Renderer.
  *
  * <p>A Glyph's outline is represented by a list of control points forming a hull
  * (vertices) around the glyph.  The outline can be drawn using successive quads 
  * where anchors are being interpolated from each set of 3 adjacent control 
- * points. This allows for continous curves even when the control points 
+ * points. This allows for continuous curves even when the control points 
  * are being displaced.  </p>
  *
  * <p>Glyphs are built out of one or more contours.  Contours are represented
- * by a list of hull points forming continous quadratic curves.  The
+ * by a list of hull points forming continuous quadratic curves.  The
  * coordinates for each of these hull points are stored in the Control Points list.
  * Because some glyphs are represented by more than one shape (holes, dot on
  * the i, etc.), each shape is defined as an array of indices into the Control Points
@@ -62,7 +62,7 @@ import processing.core.PFont;
  * <p>TextObjectGlyph objects also have two "special" properties, glyph and font,
  * which are not accessed using the standard getProperty mechanism.  The reason 
  * for this is that the list of vertices and contours forming a glyph is 
- * dependant on them, and must be rebuilt if these properties are changed.
+ * dependent on them, and must be rebuilt if these properties are changed.
  * Therefore, we provided specific get/set methods to access and modify them. 
  * 
  * <p>The glyph's ColorProperty is inherited by default. </p>
@@ -506,7 +506,7 @@ public class TextObjectGlyph extends TextObject {
         // Spaces are calculated differently because they don't have control
         // points in the same way as other glyphs.
         if ( getGlyph().equals(" ") ) {
-            Rectangle2D sb = this.pfont.findFont().getStringBounds(" ", frc);
+            Rectangle2D sb = Book.loadFontFromPFont(pfont).getStringBounds(" ", frc);
             minX = sb.getMinX();
             minY = sb.getMinY();
             maxX = sb.getMaxX();

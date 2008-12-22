@@ -1,0 +1,21 @@
+#summary Installation instructions for the NextText library.
+#labels Featured,Phase-Deploy
+
+To install the !NextText library, you can either download the package or the source.
+
+=== Package ===
+
+  * Download the ZIP file from the link on the right.
+  * Unzip the file.
+  * Move the contents to "path/to/processing/libraries".
+  * Add the library to your sketch by clicking on "Sketch > Import Library... > nexttext".
+
+
+=== Source ===
+
+  * Download the source by following [http://code.google.com/p/nexttext/source/checkout these instructions].
+  * Open up a terminal window and navigate to the root directory.
+  * Build the library using the "ant" command. This will put a ZIP file in the project directory.
+  * Unzip the file.
+  * Move the contents to "path/to/processing/libraries".
+  * Add the library to your sketch by clicking on "Sketch > Import Library... > nexttext".

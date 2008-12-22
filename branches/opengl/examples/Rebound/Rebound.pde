@@ -4,10 +4,12 @@ import net.nexttext.*;
 import net.nexttext.behaviour.control.*;
 import net.nexttext.behaviour.physics.*;
 import net.nexttext.behaviour.standard.*;
+import net.nexttext.renderer.*;
 
 /**
  * A NextText physics example.
- * <p>Throw the letters around. For best results, release the mouse while it is in motion.</p>
+ * <p>Throw the letters around. For best results, release the mouse while it is in motion.<br/>
+ * Toggle the renderers using the 1-4 keys: 1 for glyphs, 2 for bounding boxes, 3 for velocity, and 4 for internals (printed to the console).</p>
  * 
  * <p>by Elie Zananiri | Obx Labs | February 2008<br>
  * Words by <a href="http://www.mitchhedberg.net/">Mitch Hedberg</a></p>
@@ -15,7 +17,15 @@ import net.nexttext.behaviour.standard.*;
 
 // attributes
 Book book;
+TextPageRenderer boundingBoxRenderer;
+TextPageRenderer velocityRenderer;
+TextPageRenderer internalsRenderer;
 PFont cheboygan;
+
+boolean renderGlyphs = true;
+boolean renderBoundingBoxes = false;
+boolean renderVelocity = false;
+boolean renderInternals = false;
 
 void setup() {
   // init the applet
@@ -24,6 +34,14 @@ void setup() {
 
   // create the book
   book = new Book(this);
+  
+  // add a page we can later reference
+  book.addPage("The Great Page");
+  
+  // create the extra renderers
+  boundingBoxRenderer = new BoundingBoxRenderer(this, #0000CC, true, true);
+  velocityRenderer = new VelocityRenderer(this, #00CC00, 10);
+  internalsRenderer = new TextInternalsRenderer();
   
   // create the actions
   Move move = new Move(0.01f, 0.01f);
@@ -51,12 +69,26 @@ void setup() {
 
   // add the text
   // doubling all the spaces for it to look better on screen
-  book.addText("If  I  had  nine  of  my  fingers  missing  I  wouldn't  type  any  slower.", width/2, height/4, 30);
+  book.addText("If  I  had  nine  of  my  fingers  missing  I  wouldn't  type  any  slower.", 
+               width/2, height/4, 30, "The Great Page");
 }
 
 void draw() {
   background(0);
 
-  // apply the behaviours to the text and draw it
-  book.stepAndDraw();
+  // apply the behaviours to the text
+  book.step();
+  
+  // draw the text using the active renderers
+  if (renderGlyphs) book.draw();
+  if (renderBoundingBoxes) boundingBoxRenderer.renderPage(book.getPage("The Great Page"));
+  if (renderVelocity) velocityRenderer.renderPage(book.getPage("The Great Page"));
+  if (renderInternals) internalsRenderer.renderPage(book.getPage("The Great Page"));
+}
+
+void keyPressed() {
+  if (key == '1') renderGlyphs = !renderGlyphs;
+  else if (key == '2') renderBoundingBoxes = !renderBoundingBoxes;
+  else if (key == '3') renderVelocity = !renderVelocity;
+  else if (key == '4') renderInternals = !renderInternals;
 }

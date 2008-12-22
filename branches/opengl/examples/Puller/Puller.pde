@@ -58,7 +58,7 @@ void setup() {
   // set the text colour
   fill(#656F28);
   stroke(0);
-  strokeWeight(1);
+  strokeWeight(2);
   //noStroke();
   
   // add the text

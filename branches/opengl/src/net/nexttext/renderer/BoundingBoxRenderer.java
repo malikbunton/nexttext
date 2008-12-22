@@ -86,12 +86,8 @@ public class BoundingBoxRenderer extends TextPageRenderer {
      * @param to The TextObject to render
      */
     private void renderTextObject(TextObject to) {
-        // save the color and rect properties
-        boolean stroke = p.g.stroke;
-        int strokeColor = p.g.strokeColor;
-        boolean fill = p.g.fill;
-        int fillColor = p.g.fillColor;
-        int rectMode = p.g.rectMode;
+        // save the current properties
+        p.pushStyle();
         
         // draw the bounding box
         Rectangle bounds = to.getBounds();
@@ -101,16 +97,6 @@ public class BoundingBoxRenderer extends TextPageRenderer {
         p.rect(bounds.x, bounds.y, bounds.width, bounds.height);
         
         // restore saved properties
-        if (stroke) 
-            p.stroke(strokeColor);
-        else 
-            p.noStroke();
-
-        if (fill) 
-            p.fill(fillColor);
-        else 
-            p.noFill();
-        
-        p.rectMode(rectMode);
+        p.popStyle();
     }
 }

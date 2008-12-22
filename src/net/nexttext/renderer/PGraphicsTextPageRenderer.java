@@ -19,6 +19,7 @@
 
 package net.nexttext.renderer;
 
+import java.awt.BasicStroke;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.PathIterator;
 import java.util.Iterator;
@@ -189,13 +190,8 @@ public class PGraphicsTextPageRenderer extends TextPageRenderer {
      * @param glyph The TextObjectGlyph to render
      */
     protected void renderGlyph(TextObjectGlyph glyph) {
-        // save the text properties
-        boolean stroke = p.g.stroke;
-        int strokeColor = p.g.strokeColor;
-        boolean fill = p.g.fill;
-        int fillColor = p.g.fillColor;
-        int textAlign = p.g.textAlign;
-        int textAlignY = p.g.textAlignY;
+        // save the current properties
+        p.pushStyle();
 
         // set text properties
         p.textFont(glyph.getFont());
@@ -269,6 +265,32 @@ public class PGraphicsTextPageRenderer extends TextPageRenderer {
             if (glyph.isStroked()) {
                 // draw the outline of the shape
                 p.stroke(glyph.getStrokeColorAbsolute().getRGB());
+                BasicStroke bs = glyph.getStrokeAbsolute();
+                p.strokeWeight(bs.getLineWidth());
+                if (p.g instanceof PGraphicsJava2D) {
+                    switch (bs.getEndCap()) {
+                        case BasicStroke.CAP_ROUND:
+                            p.strokeCap(PApplet.ROUND);
+                            break;
+                        case BasicStroke.CAP_SQUARE:
+                            p.strokeCap(PApplet.PROJECT);
+                            break;
+                        default:
+                            p.strokeCap(PApplet.SQUARE);
+                        break;
+                    }
+                    switch (bs.getLineJoin()) {
+                        case BasicStroke.JOIN_ROUND:
+                            p.strokeJoin(PApplet.ROUND);
+                            break;
+                        case BasicStroke.JOIN_BEVEL:
+                            p.strokeJoin(PApplet.BEVEL);
+                            break;
+                        default:
+                            p.strokeJoin(PApplet.MITER);
+                        break;
+                    }
+                }
                 p.noFill();
                 strokePath(gp);
             }
@@ -279,18 +301,8 @@ public class PGraphicsTextPageRenderer extends TextPageRenderer {
             p.text(glyph.getGlyph(), 0, 0);
         }
 
-        // restore saved text properties
-        if (stroke) 
-            p.stroke(strokeColor);
-        else 
-            p.noStroke();
-
-        if (fill) 
-            p.fill(fillColor);
-        else 
-            p.noFill();
-
-        p.textAlign(textAlign, textAlignY);
+        // restore saved properties
+        p.popStyle();
 
     } // end renderGlyph
 

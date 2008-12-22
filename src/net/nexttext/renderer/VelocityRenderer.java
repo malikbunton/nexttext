@@ -83,11 +83,8 @@ public class VelocityRenderer extends TextPageRenderer {
                 Vector3 pos = to.getPositionAbsolute();
                 vel.scalar(scale);
                 
-                // save the color properties
-                boolean stroke = p.g.stroke;
-                int strokeColor = p.g.strokeColor;
-                boolean fill = p.g.fill;
-                int fillColor = p.g.fillColor;
+                // save the current properties
+                p.pushStyle();
                 
                 // draw the line
                 p.stroke(color);
@@ -95,15 +92,7 @@ public class VelocityRenderer extends TextPageRenderer {
                 p.line((float)pos.x, (float)pos.y, (float)(pos.x + vel.x), (float)(pos.y + vel.y));
                 
                 // restore saved properties
-                if (stroke) 
-                    p.stroke(strokeColor);
-                else 
-                    p.noStroke();
-
-                if (fill) 
-                    p.fill(fillColor);
-                else 
-                    p.noFill();
+                p.popStyle();
             }
         }
     }

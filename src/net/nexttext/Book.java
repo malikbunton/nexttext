@@ -294,7 +294,7 @@ public class Book {
      */
     public TextObjectGroup addText(String text, int x, int y, String pageName) {
     	TextObjectGroup tempTog = toBuilder.getParent();
-    	toBuilder.setParent(((TextPage)getPage(pageName)).getTextRoot());
+    	toBuilder.setParent(getPage(pageName).getTextRoot());
     	TextObjectGroup newTog = addText(text, x, y);
     	toBuilder.setParent(tempTog);
     	return newTog;

@@ -83,13 +83,18 @@ public class Book {
      * @param p the parent PApplet
      */
     public Book(PApplet p) {
-    	defaultRenderer = new PGraphicsTextPageRenderer(p); 
+        this.p = p;
+        
+        try {
+            defaultRenderer = new PGraphicsTextPageRenderer(p); 
+        } catch (NoClassDefFoundError e) {
+            PGraphics.showException("You must import the OpenGL library in your sketch! Even if you're not using the OpenGL renderer, the library is used to tesselate the font shapes!");
+        }
         pages = new LinkedHashMap<String, TextPage>();
     	behaviourList = new LinkedList<AbstractBehaviour>();
     	textRoot = new TextObjectRoot(this);
         spatialList = new SpatialList();
         
-        this.p = p;
         
         // create a default text page
         TextPage defaultTextPage = new TextPage(this, defaultRenderer);

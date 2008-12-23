@@ -55,7 +55,7 @@ public class PGraphicsTextPageRenderer extends TextPageRenderer {
      * 
      * @param p the parent PApplet
      */
-    public PGraphicsTextPageRenderer(PApplet p) {
+    public PGraphicsTextPageRenderer(PApplet p) throws NoClassDefFoundError {
         super(p);
         
         glu = new GLU();

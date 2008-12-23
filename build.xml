@@ -17,8 +17,18 @@
 	<path id="jogl.classpath">
 	    <pathelement location="/Developer/Applications/Java/Processing.app/Contents/Resources/Java/libraries/opengl/library/jogl.jar"/>
 	</path>
+	
+    <target name="jvm-get">
+        <condition property="jvm.ok">
+            <equals arg1="${ant.java.version}" arg2="1.5"/>
+	    </condition>
+	</target>
 
-	<target name="jar">
+	<target name="jvm-check" depends="jvm-get" unless="jvm.ok">
+	    <fail message="Wrong JVM - ${ant.java.version} - You must use Java 1.5!"/>
+	</target>
+
+	<target name="jar" depends="jvm-check">
 		<mkdir dir="bin"/>
     	<mkdir dir="lib"/>
 

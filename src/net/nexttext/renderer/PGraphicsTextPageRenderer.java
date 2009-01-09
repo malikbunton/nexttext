@@ -196,109 +196,99 @@ public class PGraphicsTextPageRenderer extends TextPageRenderer {
         // set text properties
         p.textFont(glyph.getFont());
         p.textAlign(PConstants.LEFT, PConstants.BASELINE);
+        
+        // use the cached path if possible
+        GeneralPath gp = (GeneralPath)glyph.rendererCache;
+        if ((glyph.isDeformed() || glyph.isStroked()) && gp == null) {
+            // we need to rebuild the cache
+            
+            // get the list of vertices for this glyph
+            Vector3PropertyList vertices = (Vector3PropertyList)glyph.getProperty("Control Points");
+            // create a new GeneralPath to hold the vector outline
+            gp = new GeneralPath();
+            // get an iterator for the list of contours
+            Iterator it = glyph.contours.iterator();
 
-        // ////////////////////////////////////
-        // Optmize based on presence of DForms and of outlines
-        if (glyph.isDeformed() || glyph.isStroked()) {
+            // process each contour
+            while (it.hasNext()) {
+                // get the list of vertices for this contour
+                int contour[] = (int[]) it.next();
 
-            // ////////////////////////////////
-            // Render glyph using vertex list
+                Vector3Property firstPoint = vertices.get(contour[0]);
+                // move the pen to the beginning of the contour
+                gp.moveTo((float)firstPoint.getX(), (float)firstPoint.getY());
 
-            // Use the cached path if possible.
-            GeneralPath gp = (GeneralPath) glyph.rendererCache;
+                // generate all the quads forming the line
+                for (int i = 1; i < contour.length; i++) {
+                    Vector3Property current = vertices.get(contour[i]);
+                    Vector3Property next;
 
-            if (gp == null) {
-                // we need to rebuild the cache
-                // get the list of vertices for this glyph
-                Vector3PropertyList vertices = (Vector3PropertyList) glyph
-                .getProperty("Control Points");
-                // create a new GeneralPath to hold the vector outline
-                gp = new GeneralPath();
-                // get an iterator for the list of contours
-                Iterator it = glyph.contours.iterator();
+                    // Since it's a closed contour, the last vertex's next
+                    // is the first vertex.
+                    if (i == contour.length - 1)
+                        next = vertices.get(contour[0]);
+                    else
+                        next = vertices.get(contour[i + 1]);
 
-                // process each contour
-                while (it.hasNext()) {
+                    float anchorx = (float) (current.getX() + next.getX()) / 2;
+                    float anchory = (float) (current.getY() + next.getY()) / 2;
 
-                    // get the list of vertices for this contour
-                    int contour[] = (int[]) it.next();
+                    gp.quadTo((float)current.getX(), (float)current.getY(), anchorx, anchory);
+                }
+                
+                // close the path
+                gp.closePath();
+                // cache it
+                glyph.rendererCache = gp;
+            } // end while
+        }
 
-                    Vector3Property firstPoint = vertices.get(contour[0]);
-                    // move the pen to the beginning of the contour
-                    gp.moveTo((float) firstPoint.getX(), (float) firstPoint
-                            .getY());
-
-                    // generate all the quads forming the line
-                    for (int i = 1; i < contour.length; i++) {
-
-                        Vector3Property current = vertices.get(contour[i]);
-                        Vector3Property next;
-
-                        // Since it's a closed contour, the last vertex's next
-                        // is the first vertex.
-                        if (i == contour.length - 1)
-                            next = vertices.get(contour[0]);
-                        else
-                            next = vertices.get(contour[i + 1]);
-
-                        float anchorx = (float) (current.getX() + next.getX()) / 2;
-                        float anchory = (float) (current.getY() + next.getY()) / 2;
-
-                        gp.quadTo((float) current.getX(), (float) current
-                                .getY(), anchorx, anchory);
-                    }
-                    // close the path
-                    gp.closePath();
-                    // cache it
-                    glyph.rendererCache = gp;
-                } // end while
-            }
-
-
-            if (glyph.isFilled()) {
+        // optimize rendering based on the presence of DForms and of outlines
+        if (glyph.isFilled()) {
+            if (glyph.isDeformed()) {
                 // fill the shape
                 p.noStroke();
                 p.fill(glyph.getColorAbsolute().getRGB());
                 fillPath(gp);
+                
+            } else {
+                // render glyph using Processing's native PFont drawing method
+                p.fill(glyph.getColorAbsolute().getRGB());
+                p.text(glyph.getGlyph(), 0, 0);
             }
+        }
 
-            if (glyph.isStroked()) {
-                // draw the outline of the shape
-                p.stroke(glyph.getStrokeColorAbsolute().getRGB());
-                BasicStroke bs = glyph.getStrokeAbsolute();
-                p.strokeWeight(bs.getLineWidth());
-                if (p.g instanceof PGraphicsJava2D) {
-                    switch (bs.getEndCap()) {
-                        case BasicStroke.CAP_ROUND:
-                            p.strokeCap(PApplet.ROUND);
-                            break;
-                        case BasicStroke.CAP_SQUARE:
-                            p.strokeCap(PApplet.PROJECT);
-                            break;
-                        default:
-                            p.strokeCap(PApplet.SQUARE);
+        if (glyph.isStroked()) {
+            // draw the outline of the shape
+            p.stroke(glyph.getStrokeColorAbsolute().getRGB());
+            BasicStroke bs = glyph.getStrokeAbsolute();
+            p.strokeWeight(bs.getLineWidth());
+            if (p.g instanceof PGraphicsJava2D) {
+                switch (bs.getEndCap()) {
+                    case BasicStroke.CAP_ROUND:
+                        p.strokeCap(PApplet.ROUND);
                         break;
-                    }
-                    switch (bs.getLineJoin()) {
-                        case BasicStroke.JOIN_ROUND:
-                            p.strokeJoin(PApplet.ROUND);
-                            break;
-                        case BasicStroke.JOIN_BEVEL:
-                            p.strokeJoin(PApplet.BEVEL);
-                            break;
-                        default:
-                            p.strokeJoin(PApplet.MITER);
+                    case BasicStroke.CAP_SQUARE:
+                        p.strokeCap(PApplet.PROJECT);
                         break;
-                    }
+                    default:
+                        p.strokeCap(PApplet.SQUARE);
+                    break;
                 }
-                p.noFill();
-                strokePath(gp);
+                switch (bs.getLineJoin()) {
+                    case BasicStroke.JOIN_ROUND:
+                        p.strokeJoin(PApplet.ROUND);
+                        break;
+                    case BasicStroke.JOIN_BEVEL:
+                        p.strokeJoin(PApplet.BEVEL);
+                        break;
+                    default:
+                        p.strokeJoin(PApplet.MITER);
+                    break;
+                }
             }
-
-        } else {
-            // render glyph using Processing's native PFont drawing method
-            p.fill(glyph.getColorAbsolute().getRGB());
-            p.text(glyph.getGlyph(), 0, 0);
+            p.noFill();
+            strokePath(gp);
         }
 
         // restore saved properties

@@ -82,7 +82,7 @@ public class Book {
      * @param p the parent PApplet
      */
     public Book(PApplet p) {
-        this (p, PConstants.OPENGL);
+        this (p, PConstants.JAVA2D);
     }
     
     

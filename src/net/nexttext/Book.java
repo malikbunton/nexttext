@@ -70,26 +70,45 @@ public class Book {
     public void incrementFrameCount() { frameCount++; }
 	
     protected LinkedHashMap<String, TextPage> pages;
-    protected PGraphicsTextPageRenderer defaultRenderer;
+    protected TextPageRenderer defaultRenderer;
     protected List<AbstractBehaviour> behaviourList;
     protected TextObjectRoot textRoot;	// the root of the TextObject hierarchy
     protected InputManager inputs;
     protected SpatialList spatialList;
+    
+    /**
+     * Instantiates the Book with a default renderer.
+     * 
+     * @param p the parent PApplet
+     */
+    public Book(PApplet p) {
+        this (p, PConstants.OPENGL);
+    }
     
     
     /**
      * Instantiates the Book.
      * 
      * @param p the parent PApplet
+     * @param rendererType the type of renderer to use, can be JAVA2D or OPENGL
      */
-    public Book(PApplet p) {
+    public Book(PApplet p, String rendererType) {
         this.p = p;
         
-        try {
-            defaultRenderer = new PGraphicsTextPageRenderer(p); 
-        } catch (NoClassDefFoundError e) {
-            PGraphics.showException("You must import the OpenGL library in your sketch! Even if you're not using the OpenGL renderer, the library is used to tesselate the font shapes!");
+        if (rendererType == PConstants.JAVA2D) {
+            try {
+                defaultRenderer = new Java2DTextPageRenderer(p); 
+            } catch (ClassCastException e) {
+                PGraphics.showException("The NextText and PApplet renderers are incompatible! Use the default renderer if you don't know what you are doing!");
+            }
+        } else {
+            try {
+                defaultRenderer = new PGraphicsTextPageRenderer(p); 
+            } catch (NoClassDefFoundError e) {
+                PGraphics.showException("You must import the OpenGL library in your sketch! Even if you're not using the OpenGL renderer, the library is used to tesselate the font shapes!");
+            }
         }
+        
         pages = new LinkedHashMap<String, TextPage>();
     	behaviourList = new LinkedList<AbstractBehaviour>();
     	textRoot = new TextObjectRoot(this);

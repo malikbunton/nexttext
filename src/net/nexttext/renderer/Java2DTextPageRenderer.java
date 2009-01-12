@@ -26,6 +26,9 @@ import java.awt.geom.GeneralPath;
 import java.util.Iterator;
 import java.util.Stack;
 
+import processing.core.*;
+
+import net.nexttext.Book;
 import net.nexttext.TextObject;
 import net.nexttext.TextObjectGlyph;
 import net.nexttext.TextObjectGroup;
@@ -47,9 +50,9 @@ import net.nexttext.property.Vector3PropertyList;
 public class Java2DTextPageRenderer extends TextPageRenderer {
     protected Graphics2D g2;
 
-    public Java2DTextPageRenderer(Component canvas, Graphics2D g2) {
-        super(canvas);
-        this.g2 = g2;
+    public Java2DTextPageRenderer(PApplet p) throws ClassCastException {
+        super(p);
+        this.g2 = ((PGraphicsJava2D)p.g).g2;
     }
 
     /**
@@ -62,12 +65,11 @@ public class Java2DTextPageRenderer extends TextPageRenderer {
         // When resizing, it's possible to lose the reference to the graphics
         // context, so we skip rendering the frame.
         if (g2 == null) {
-            System.out.println(("Skip rendering frame because the graphics "
-                    + "context was lost temporarily."));
+            System.out.println(("Skip rendering frame because the graphics context was lost temporarily."));
         }
 
         else if (textPage.getTextRoot() == null) {
-            System.out.println("Java2DTextPage: No root specified yet");
+            System.out.println("TextPage: No root specified yet");
         } 
         
         // traverse the TextObject hierarchy
@@ -186,7 +188,7 @@ public class Java2DTextPageRenderer extends TextPageRenderer {
     protected void renderGlyph(TextObjectGlyph glyph) {
 
         // ////////////////////////////////////
-        // Optmize based on presence of DForms and of outlines
+        // Optimize based on presence of DForms and of outlines
         if (glyph.isDeformed() || glyph.isStroked()) {
 
             // ////////////////////////////////
@@ -259,7 +261,7 @@ public class Java2DTextPageRenderer extends TextPageRenderer {
             // Render glyph using Graphics.drawString()
             g2.setColor(glyph.getColorAbsolute());
             // set the font
-            g2.setFont(glyph.getFont());
+            g2.setFont(Book.loadFontFromPFont(glyph.getFont()));
             // draw the glyph
             g2.drawString(glyph.getGlyph(), 0, 0);
         }

@@ -60,11 +60,6 @@ String STATS[][] = {
   }
 };
 
-Behaviour behaviourTree;
-IsInside isInside;
-MoveBy moveBy;
-Kill kill;
-
 void setup() {
   // init the applet
   size(600, 400, OPENGL);
@@ -95,19 +90,20 @@ void addStat(int type) {
   fill(0);
   noStroke();
   
-  // create the Behaviour tree
-  kill = new Kill();
-  moveBy = new MoveBy(0, height/FRAMERATES[type]);
-  isInside = new IsInside(this.getBounds(), moveBy, kill);
-  behaviourTree = isInside.makeBehaviour();
-    
-  book.addGroupBehaviour(behaviourTree);
+  // create the behaviours
+  Kill kill = new Kill();
+  MoveBy moveBy = new MoveBy(0, height/FRAMERATES[type]);
+  // move the text if it's in the window, kill it if it goes passed it
+  IsInside isInside = new IsInside(this.getBounds(), moveBy, kill);
+  
+  // add the behaviour tree to the tree
+  Behaviour isInsideBehaviour = book.addGroupBehaviour(isInside);
   
   // add the text to the appropriate page
   book.addText(STATS[type][(int)random(0, STATS[type].length)], 2, 40, PAGES[type]);
   
   // clean up
-  book.removeGroupBehaviour(behaviourTree);
+  book.removeGroupBehaviour(isInsideBehaviour);
 }
 
 void drawBar(int type) {

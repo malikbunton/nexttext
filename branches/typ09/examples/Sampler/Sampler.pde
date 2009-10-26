@@ -9,7 +9,7 @@ import net.nexttext.behaviour.dform.*;
  * A NextText sketch where different behaviours can be applied
  * to the text using the 1, 2, 3, 4, 5 keys.
  *
- * by Elie Zananiri | Obx Labs | June 2007
+ * by Elie Zananiri | Obx Labs | October 2009
  */
 
 // global attributes
@@ -26,10 +26,12 @@ void setup() {
   book = new Book(this);
 
   // load and set the font and color attributes
-  font = createFont("GeometricBlack.ttf", 48, true);
+  font = createFont("GeometricBlack.ttf", 96, true);
   textFont(font);
+  textAlign(CENTER, CENTER);
   fill(255);
   stroke(241, 100, 34);
+  strokeWeight(5);
  
   // create the Selector and add all the Actions to it
   // a Selector is a control action that manages multiple
@@ -37,13 +39,6 @@ void setup() {
   // in this case, when keyboard keys are pressed.
   selector = new Selector();
 
-  // add Throb, ChaosPull, Reform, RandomMotion
-  // and Colorize actions to the Selector
-  selector.add("Throb", new Throb(2, 100));
-  // The Book.mouse passed to ChaosPull keeps the up-to-date mouse position
-  selector.add("ChaosPull", new ChaosPull(Book.mouse));
-  selector.add("Reform", new Reform());
-  selector.add("RandomMotion", new RandomMotion());
   // Chain allows to string together actions sequentially
   Chain colour = new Chain();
   colour.add(new Colorize(Color.BLACK, 5)); // The first chained action will fade to black
@@ -51,14 +46,32 @@ void setup() {
   // Wrapping the Chain action in a Repeat action will repeat it indefinitely
   selector.add("Colour", new Repeat(colour));
 
-  // add the Selector to the Book to affect future glyphs that are added
-  book.addGlyphBehaviour(selector);
-  // select the Throb behavior as default
-  selector.select("Throb");
+  selector.add("RandomMotion", new RandomMotion());
+  
+  // Multiplexer allows to string together actions in unison
+  Multiplexer physics = new Multiplexer();
+  physics.add(new Move(0.01f, 0.01f));
+  physics.add(new Gravity(4));
+  selector.add("Physics", physics);
+  
+  // The Book.mouse passed to ChaosPull keeps the up-to-date mouse position
+  selector.add("ChaosPull", new ChaosPull(Book.mouse));
+  
+  selector.add("Throb", new Throb(2, 100));
+  
+  // convert the action into a behaviour  
+  Behaviour selectorBehaviour = selector.makeBehaviour();
+  // add the Selector Behaviour to the Book to affect future glyphs
+  // that are added
+  book.addGlyphBehaviour(selectorBehaviour);
+  book.addGlyphBehaviour(new StayInWindow(this));
+  
+  // select the Colour behavior as default
+  selector.select("Colour");
   
   // add the text to the book, which uses all previously set
   // properties (font, color, behaviours, etc.)
-  book.addText(word, 320, 200); 
+  book.addText(word, width/2, height/2); 
 }
 
 void draw() {
@@ -75,19 +88,19 @@ void draw() {
 void keyPressed() {
   switch (key) {
     case '1':
-      selector.select("Throb");
+      selector.select("Colour");
       break;
     case '2':
-      selector.select("ChaosPull");
-      break;
-    case '3':
-      selector.select("Reform");
-      break;
-    case '4':
       selector.select("RandomMotion");
       break;
+    case '3':
+      selector.select("Physics");
+      break;
+    case '4':
+      selector.select("ChaosPull");
+      break;
     case '5':
-      selector.select("Colour");
+      selector.select("Throb");
       break;
   }
 }

@@ -31,7 +31,7 @@ public class MouseInertia extends PhysicsAction {
         
         // an attempt at calculating angular force... it seems to work but
         // if anyone knows of a better way of doing this please let me know
-        double angle = p.min(p.abs(dX), p.abs(dY))/(inertia.length()+.001)/100.0;
+        double angle = p.min(p.abs(dX), p.abs(dY))/(inertia.length()+.001f)/100.0f;
         int aFactor;
         if (inertia.x*inertia.y < 0) {
           aFactor = -1;

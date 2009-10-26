@@ -28,26 +28,22 @@ void setup() {
   book = new Book(this);
   
   // pull the text with the first mouse button
-  Action pull = new Pull(Book.mouse, 10, 2);
-  AbstractBehaviour pullOnOne = new OnMouseDepressed(pull).makeBehaviour();
-  pullOnOne.setDisplayName("Pull");
+  Pull pull = new Pull(Book.mouse, 10, 2);
+  OnMouseDepressed pullOnLeft = new OnMouseDepressed(LEFT, pull);
   
   // move the text with the middle mouse button
-  MoveTo moveTo = new MoveTo(Book.mouse, Long.MAX_VALUE);
-  OnDrag onDrag = new OnDrag(CENTER, new Repeat(moveTo, 0));
-  moveTo.setTarget(onDrag);
-  AbstractBehaviour dragOnTwo = onDrag.makeBehaviour();
-  dragOnTwo.setDisplayName("Drag");
+  MoveTo followMouse = new MoveTo(Book.mouse);
+  Repeat followMouseAlways = new Repeat(followMouse);
+  OnDrag dragOnMiddle = new OnDrag(CENTER, followMouseAlways);
   
-  // reform the text with the last mouse button
-  Action reform = new Reform();
-  AbstractBehaviour reformOnThree = new OnMouseDepressed(RIGHT, reform).makeBehaviour();
-  reformOnThree.setDisplayName("Reform");
-
+  // reform the text with the right mouse button
+  Reform reform = new Reform();
+  OnMouseDepressed reformOnRight = new OnMouseDepressed(RIGHT, reform);
+  
   // add the behaviours to the book
-  book.addGroupBehaviour(pullOnOne);
-  book.addGroupBehaviour(dragOnTwo);
-  book.addGroupBehaviour(reformOnThree);
+  book.addGroupBehaviour(pullOnLeft);
+  book.addGroupBehaviour(dragOnMiddle);
+  book.addGroupBehaviour(reformOnRight);
 
   // init and set the font
   gangOfThree = createFont("GangOfThree.ttf", 28, true);
@@ -58,7 +54,6 @@ void setup() {
   fill(#656F28);
   stroke(0);
   strokeWeight(2);
-  //noStroke();
   
   // add the text
   book.addText("Dogs are forever in the push up position.", width/2, height/2);
@@ -75,4 +70,3 @@ void draw() {
   // apply the behaviours to the text and draw it
   book.stepAndDraw();
 }
-

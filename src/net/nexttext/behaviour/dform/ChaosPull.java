@@ -44,13 +44,62 @@ public class ChaosPull extends DForm implements TargetingAction{
         this.target = target;
     }
     
+    /**
+     * Constructor.
+     * @param target location of the attraction point that pulls the vertices
+     * @param chaosStrength strength of the attraction
+     */
+    public ChaosPull( Locatable target, int chaosStrength ) {
+        this.target = target;        
+        this.chaosStrength = chaosStrength;
+    }
+    
+    /**
+     * Constructor creates a ChaosPull at the target with a default strength of 1200.
+     * @param target
+     */
     public ChaosPull( Locatable target ) {
         this(target, 1200);
     }
     
-    public ChaosPull( Locatable target, int chaosStrength ) {
-        this.target = target;        
-        this.chaosStrength = chaosStrength;
+    /**
+     * Constructor creates a ChaosPull at x,y.
+     * @param x
+     * @param y
+     * @param chaosStrength
+     */
+    public ChaosPull ( float x, float y, int chaosStrength ) {
+        this(x, y, 0, chaosStrength);
+    }
+   
+    /**
+     * Constructor creates a ChaosPull at x,y with a default strength of 1200.
+     * @param x
+     * @param y
+     */
+    public ChaosPull ( float x, float y ) {
+        this(x, y, 0, 1200);
+    }
+    
+    /**
+     * Constructor creates a ChaosPull at x,y,z with a default strength of 1200.
+     * @param x
+     * @param y
+     * @param z
+     */
+    public ChaosPull ( float x, float y, float z ) {
+        this(x, y, z, 1200);
+    }
+
+    /**
+     * Constructor creates a ChaosPull at x,y,z.
+     * @param x
+     * @param y
+     * @param z
+     * @param chaosStrength
+     */
+    public ChaosPull ( float x, float y, float z, int chaosStrength ) {
+        this(new Vector3(x, y, z), chaosStrength);
     }
     
     /* (non-Javadoc)

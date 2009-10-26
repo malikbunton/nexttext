@@ -50,9 +50,6 @@ public class PGraphicsTextPageRenderer extends TextPageRenderer {
     protected TessCallback tessCallback;
     protected GLUtessellator tobj;
 
-    //detail of flattened bezier curves
-	protected int bezierDetail;
-
     /**
      * Builds a TextPageRenderer.
      * 
@@ -69,8 +66,6 @@ public class PGraphicsTextPageRenderer extends TextPageRenderer {
         glu.gluTessCallback(tobj, GLU.GLU_TESS_VERTEX, tessCallback); 
         glu.gluTessCallback(tobj, GLU.GLU_TESS_COMBINE, tessCallback); 
         glu.gluTessCallback(tobj, GLU.GLU_TESS_ERROR, tessCallback); 
-        
-        bezierDetail = 4;
     }
 
     /**
@@ -199,7 +194,7 @@ public class PGraphicsTextPageRenderer extends TextPageRenderer {
         p.pushStyle();
 
         // set text properties
-        p.textFont(glyph.getFont(), glyph.getFont().getFont().getSize());
+        p.textFont(glyph.getFont());
         p.textAlign(PConstants.LEFT, PConstants.BASELINE);
         
         // use the cached path if possible
@@ -212,12 +207,12 @@ public class PGraphicsTextPageRenderer extends TextPageRenderer {
             // create a new GeneralPath to hold the vector outline
             gp = new GeneralPath();
             // get an iterator for the list of contours
-            Iterator it = glyph.contours.iterator();
+            Iterator<int[]> it = glyph.contours.iterator();
 
             // process each contour
             while (it.hasNext()) {
                 // get the list of vertices for this contour
-                int contour[] = (int[]) it.next();
+                int contour[] = it.next();
 
                 Vector3Property firstPoint = vertices.get(contour[0]);
                 // move the pen to the beginning of the contour
@@ -311,10 +306,9 @@ public class PGraphicsTextPageRenderer extends TextPageRenderer {
         float textPoints[] = new float[6];
 
         PathIterator iter = gp.getPathIterator(null);
-
+        
         float lastX = 0;
         float lastY = 0;
- 
         double vertex[];
         
         while (!iter.isDone()) {
@@ -323,36 +317,38 @@ public class PGraphicsTextPageRenderer extends TextPageRenderer {
                 case PathIterator.SEG_MOVETO:
                     p.beginShape();
                     p.vertex(textPoints[0], textPoints[1]);
+                    
                     lastX = textPoints[0];
                     lastY = textPoints[1];
+                    
                     break;
-                	
+
                 case PathIterator.SEG_QUADTO:
-
-                	for (int i = 1; i < bezierDetail; i++) {
-                		float t = (float)i/(float)bezierDetail;
-	                    vertex = new double[] {
-	                            p.g.bezierPoint(
-	                                    lastX, 
-	                                    lastX + ((textPoints[0]-lastX)*2/3), 
-	                                    textPoints[2] + ((textPoints[0]-textPoints[2])*2/3), 
-	                                    textPoints[2], 
-	                                    t
-	                            ),
-	                            p.g.bezierPoint(
-	                                    lastY, 
-	                                    lastY + ((textPoints[1]-lastY)*2/3),
-	                                    textPoints[3] + ((textPoints[1]-textPoints[3])*2/3), 
-	                                    textPoints[3], 
-	                                    t
-	                            ), 
-	                            0
-	                    };
-	                    p.vertex((float)vertex[0], (float)vertex[1]);
-                	}
-
+                    vertex = new double[] {
+                            p.g.bezierPoint(
+                                    lastX, 
+                                    textPoints[0], 
+                                    textPoints[2], 
+                                    textPoints[2], 
+                                    0.5f
+                            ),
+                            p.g.bezierPoint(
+                                    lastY, 
+                                    textPoints[1],
+                                    textPoints[3], 
+                                    textPoints[3], 
+                                    0.5f
+                            ), 
+                            0
+                    };
+                    p.vertex(lastX, lastY);
+                    //p.bezierVertex(lastX, lastY, (float)vertex[0], (float)vertex[1], textPoints[2], textPoints[3]);
+                    p.vertex((float)vertex[0], (float)vertex[1]);
                     lastX = textPoints[2];
                     lastY = textPoints[3];
+                    
+                    p.vertex(lastX, lastY);
+                    
                     break;
 
                 case PathIterator.SEG_CLOSE:
@@ -416,29 +412,25 @@ public class PGraphicsTextPageRenderer extends TextPageRenderer {
                     break;
 
                 case PathIterator.SEG_QUADTO:   // 2 points
-                	
-                	for (int i = 1; i < bezierDetail; i++) {
-                		float t = (float)i/(float)bezierDetail;
-	                    vertex = new double[] {
-	                            p.g.bezierPoint(
-	                                    lastX, 
-	                                    lastX + ((textPoints[0]-lastX)*2/3), 
-	                                    textPoints[2] + ((textPoints[0]-textPoints[2])*2/3), 
-	                                    textPoints[2], 
-	                                    t
-	                            ),
-	                            p.g.bezierPoint(
-	                                    lastY, 
-	                                    lastY + ((textPoints[1]-lastY)*2/3),
-	                                    textPoints[3] + ((textPoints[1]-textPoints[3])*2/3), 
-	                                    textPoints[3], 
-	                                    t
-	                            ), 
-	                            0
-	                    };
-	                    
-	                    glu.gluTessVertex(tobj, vertex, 0, vertex);
-                	}
+                    vertex = new double[] {
+                            p.g.bezierPoint(
+                                    lastX, 
+                                    textPoints[0], 
+                                    textPoints[2], 
+                                    textPoints[2], 
+                                    0.5f
+                            ),
+                            p.g.bezierPoint(
+                                    lastY, 
+                                    textPoints[1],
+                                    textPoints[3], 
+                                    textPoints[3], 
+                                    0.5f
+                            ), 
+                            0
+                    };
+                    
+                    glu.gluTessVertex(tobj, vertex, 0, vertex);
                     
                     lastX = textPoints[2];
                     lastY = textPoints[3];

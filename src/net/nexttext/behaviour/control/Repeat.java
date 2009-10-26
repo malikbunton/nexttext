@@ -44,6 +44,10 @@ import net.nexttext.property.Property;
 public class Repeat extends AbstractAction {
 
     Action action;
+    
+    public Repeat( Action action ) {
+        this(action, 0);
+    }
 
     /**
      * @param repetitions is the number of times to repeat, use 0 to repeat

@@ -44,6 +44,15 @@ public class MoveTo extends AbstractAction implements TargetingAction {
     }
     
     /**
+     * @param speed The speed of the approach represented as the number of
+     * pixels to move in each frame.  Use a very large number for instant
+     * travel.
+     */
+    public MoveTo( Locatable target ) {
+        this(target, Long.MAX_VALUE);
+    }
+    
+    /**
 	 * @param speed The speed of the approach represented as the number of
 	 * pixels to move in each frame.  Use a very large number for instant
 	 * travel.

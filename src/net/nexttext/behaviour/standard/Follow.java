@@ -29,7 +29,7 @@ import net.nexttext.property.Property;
 /**
  * Causes TextObjects to follow their left siblings.
  *
- * <p>The provided TargettingAction is used to have TextObjects follow their
+ * <p>The provided TargetingAction is used to have TextObjects follow their
  * left siblings.  </p>
  */
 /* $Id$ */

@@ -474,13 +474,30 @@ public class Book {
     /**
      * Adds the given Behaviour to the list of Behaviours applied to new TextObjectGlyphs.
      * <p>The Behaviour will only be added to TextObjects created after this method is called.</p>
-     * <p>The Behaviour is automatically added to the NTPBook.</p>
+     * <p>The Behaviour is automatically added to the Book.</p>
      * 
      * @param b the Behaviour to add
      */
     public void addGlyphBehaviour(AbstractBehaviour b) { 
         toBuilder.addGlyphBehaviour(b);
         addBehaviour(b);
+    }
+
+    /**
+     * Adds the given Action to the list of Behaviours applied to new TextObjectGlyphs.
+     * <p>The Action is converted into a Behaviour automatically.</p>
+     * <p>The Behaviour will only be added to TextObjects created after this method is called.</p>
+     * <p>The Behaviour is automatically added to the Book.</p>
+     * <p>The Behaviour is returned to allow calling removeGlyphBehaviour with the correct object.</p>
+     * 
+     * @param action the AbstractAction to convert and add as a behaviour
+     * @return the behaviour created from the action
+     */
+    public Behaviour addGlyphBehaviour(AbstractAction action) { 
+        Behaviour b = action.makeBehaviour();
+        toBuilder.addGlyphBehaviour(b);
+        addBehaviour(b);
+        return b;
     }
     
     /**
@@ -503,13 +520,30 @@ public class Book {
     /**
      * Adds the given Behaviour to the list of Behaviours applied to new TextObjectGroups.
      * <p>The Behaviour will only be added to TextObjects created after this method is called.</p>
-     * <p>The Behaviour is automatically added to the NTPBook.</p>
+     * <p>The Behaviour is automatically added to the Book.</p>
      * 
      * @param b the Behaviour to add
      */
     public void addGroupBehaviour(AbstractBehaviour b) { 
         toBuilder.addGroupBehaviour(b);
         addBehaviour(b);
+    }
+
+    /**
+     * Adds the given Action to the list of Behaviours applied to new TextObjectGroups.
+     * <p>The Action is converted into a Behaviour automatically.</p>
+     * <p>The Behaviour will only be added to TextObjects created after this method is called.</p>
+     * <p>The Behaviour is automatically added to the Book.</p>
+     * <p>The Behaviour is returned to allow calling removeGlyphBehaviour with the correct object.</p>
+     * 
+     * @param action the AbstractAction to convert and add as a behaviour
+     * @return the behaviour created from the action
+     */
+    public Behaviour addGroupBehaviour(AbstractAction action) { 
+        Behaviour b = action.makeBehaviour();
+        toBuilder.addGroupBehaviour(b);
+        addBehaviour(b);
+        return b;
     }
     
     /**

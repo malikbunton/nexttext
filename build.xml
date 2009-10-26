@@ -28,7 +28,7 @@
 	    <fail message="Wrong JVM - ${ant.java.version} - You must use Java 1.5!"/>
 	</target>
 
-	<target name="jar" depends="jvm-check">
+	<target name="jar">
 		<mkdir dir="bin"/>
     	<mkdir dir="lib"/>
 

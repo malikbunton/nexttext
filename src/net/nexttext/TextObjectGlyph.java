@@ -84,7 +84,7 @@ public class TextObjectGlyph extends TextObject {
 	
 	/** A vector containing int[] arrays with indices to the Control Points property
 	 list.  These contours define the shape of the glyph */
-	public Vector 		contours;   	
+	public Vector<int[]> 		contours;   	
    	 
    	/** 
    	 * This rectangle stores the glyph's "logical bounds", including proper
@@ -285,7 +285,7 @@ public class TextObjectGlyph extends TextObject {
 		vertices.clear();
 
 		// create a Vector to store the list of contours
-		this.contours = new Vector();
+		this.contours = new Vector<int[]>();
 		
 		// vertice array index (used to associate more than one contour point
 		// with the same vertex)
